@@ -1,16 +1,19 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include "gui.h"
 
-static gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
-static gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr, double volume_bar_height);
-static gboolean callback(gpointer userdata);
+bool gui(void);
+gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
+gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr);
+gboolean callback(gpointer u);
 
 char volume_value[5] = "10";
 
 
-
-int main(int argc, char **argv)
+bool gui(void)
 {
+    int argc; char **argv;
     gtk_init(&argc, &argv);
 
     GtkWidget *text_view;
@@ -25,14 +28,14 @@ int main(int argc, char **argv)
 
     gtk_widget_show_all(window);
 
-    g_timeout_add(5000, callback, NULL);
+    g_timeout_add(2000, callback, window);
 
     gtk_main();
 
     return 0;
 }
 
-static gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
+gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 {
     GdkRGBA color;
     cairo_rectangle(cr, 0, 0, 60, 200);
@@ -43,14 +46,14 @@ static gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     return FALSE;
 }
 
-static gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr, double volume_bar_height)
+gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 {
-    double volume_bar_gap, rect_height = 200;
-    volume_bar_height = 20;
-    volume_bar_gap = rect_height - volume_bar_height;
+    double gap, max_rect_height = 200, rect_height = 20;
+
+    gap = max_rect_height - rect_height;
 
     GdkRGBA color;
-    cairo_rectangle(cr, 0, volume_bar_gap, 60, volume_bar_height);
+    cairo_rectangle(cr, 0, gap, 60, rect_height);
     gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
     cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 0.6);
     cairo_fill (cr);
@@ -65,10 +68,13 @@ static gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr, double volume_bar_he
     return FALSE;
 }
 
-static gboolean callback(gpointer userdata)
+gboolean callback(gpointer u)
 {
-    GtkWidget *window;
-    gtk_widget_hide(window);
+    //GtkWidget *window;
+    //gtk_widget_hide(window);
+    gtk_main_quit();
+    //return FALSE;
+
 }
 
 
