@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-
-bool volume_change(void);
+bool input_read(void);
 
 #endif

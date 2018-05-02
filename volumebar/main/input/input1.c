@@ -6,11 +6,10 @@
 #include <stdbool.h>
 #include "input1.h"
 
-int pev;
 
-bool volume_change(void); // tutaj dzi³a jak powinna, sprawdzone.
+bool input_read(void);
 
-int input()
+bool input_read(void)
 {
         char devname[] = "/dev/input/event3";
         int device = open(devname, O_RDONLY);
@@ -19,15 +18,15 @@ int input()
         while(1)
         {
                 read(device,&ev, sizeof(ev));
-                pev = ev.code;
+
+                if((ev.code == 114 && ev.value == 1) || (ev.code == 115 && ev.value == 1))
+                {
+                    printf("input read here\n");
+                    return true;
+                }
+
 
         }
 }
 
-bool volume_change(void)
-{
-    if(pev == 114 || pev == 115)
-    {
-    return true;
-    }
-}
+
