@@ -21,7 +21,6 @@ bool input_read(void)
 
                 if((ev.code == 114 && ev.value == 1) || (ev.code == 115 && ev.value == 1))
                 {
-                    printf("input read here\n");
                     return true;
                 }
 
