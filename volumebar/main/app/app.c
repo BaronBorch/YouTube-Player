@@ -19,8 +19,8 @@ int main()
 	b = (a+102.4)*0.94;
 
 	snprintf(buf, 3, "%f", b);
-	printf( "%f\n%s\n", b, buf); // tymczasowy sprawdzian czy dzia³a jak powinno.
-    gui();
+	printf( "%s\n", buf); // tymczasowy sprawdzian czy dzia³a jak powinno.
+    gui(b, buf);
     }
     }
 
