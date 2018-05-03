@@ -1,18 +1,23 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "gui.h"
 
-bool gui(void);
+bool gui(double height, char inscription[5]);
 gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
 gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr);
-gboolean callback(gpointer u);
+gboolean cback(gpointer u);
 
-char volume_value[5] = "10";
+double rect_height;
+char value[5];
 
 
-bool gui(void)
+bool gui(double height, char inscription[5])
 {
+    rect_height = height*2;
+    strncpy(value, inscription, 5);
+
     int argc; char **argv;
     gtk_init(&argc, &argv);
 
@@ -28,11 +33,11 @@ bool gui(void)
 
     gtk_widget_show_all(window);
 
-    g_timeout_add(2000, callback, window);
+    g_timeout_add(1000, cback, NULL);
 
     gtk_main();
 
-    return 0;
+    return true;
 }
 
 gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
@@ -48,7 +53,7 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 
 gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 {
-    double gap, max_rect_height = 200, rect_height = 20;
+    double gap, max_rect_height = 200;
 
     gap = max_rect_height - rect_height;
 
@@ -61,19 +66,20 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size (cr, 30.0);
     cairo_move_to (cr, 8.0, 110.0);
-    cairo_text_path (cr, volume_value);
+    cairo_text_path (cr, value);
     cairo_set_source_rgb (cr, 1, 0.3, 0);
     cairo_fill_preserve (cr);
 
     return FALSE;
 }
 
-gboolean callback(gpointer u)
+gboolean cback(gpointer u)
 {
-    //GtkWidget *window;
-    //gtk_widget_hide(window);
+
+    //gtk_widget_hide(u);
+    //gtk_window_close(u);
     gtk_main_quit();
-    //return FALSE;
+    return FALSE;
 
 }
 
