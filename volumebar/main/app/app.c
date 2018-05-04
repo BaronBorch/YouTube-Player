@@ -3,8 +3,9 @@
 #include <string.h>
 #include "input1.h"
 #include "gui.h"
+#include "app.h"
 
-int main()
+void app()
 {
     while(1)
     {
@@ -23,9 +24,4 @@ int main()
     gui(b, buf);
     }
     }
-
-
-
-	return 0;
-
 }
