@@ -18,8 +18,8 @@ bool gui(double height, char inscription[5])
     rect_height = height*2;
     strncpy(value, inscription, 5);
 
-    int argc; char **argv;
-    gtk_init(&argc, &argv);
+    //int argc; char **argv;
+    gtk_init(0, 0);
 
     GtkWidget *text_view;
     GtkWidget *window = gtk_window_new(GTK_WINDOW_POPUP);
@@ -33,9 +33,12 @@ bool gui(double height, char inscription[5])
 
     gtk_widget_show_all(window);
 
-    g_timeout_add(1000, cback, NULL);
+    g_timeout_add(10, cback, NULL);
 
     gtk_main();
+
+    //gtk_window_close(GTK_WINDOW(window));  //nie zamyka okna
+    //gtk_widget_hide(window);    // nie chowa okna
 
     return true;
 }
@@ -76,8 +79,8 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 gboolean cback(gpointer u)
 {
 
-    //gtk_widget_hide(u);
-    //gtk_window_close(u);
+    //gtk_widget_hide(u);     //Gtk-CRITICAL **: gtk_widget_hide: assertion 'GTK_IS_WIDGET (widget)' failed
+    //gtk_window_close(u);    //Naruszenie ochrony pamiêci
     gtk_main_quit();
     return FALSE;
 
