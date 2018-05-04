@@ -18,7 +18,6 @@ bool gui(double height, char inscription[5])
     rect_height = height*2;
     strncpy(value, inscription, 5);
 
-    //int argc; char **argv;
     gtk_init(0, 0);
 
     GtkWidget *text_view;
@@ -29,7 +28,6 @@ bool gui(double height, char inscription[5])
 
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
-
 
     gtk_widget_show_all(window);
 
@@ -78,12 +76,10 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 
 gboolean cback(gpointer u)
 {
-
     //gtk_widget_hide(u);     //Gtk-CRITICAL **: gtk_widget_hide: assertion 'GTK_IS_WIDGET (widget)' failed
     //gtk_window_close(u);    //Naruszenie ochrony pamiêci
     gtk_main_quit();
     return FALSE;
-
 }
 
 
