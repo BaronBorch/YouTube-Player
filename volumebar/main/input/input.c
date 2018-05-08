@@ -6,11 +6,9 @@
 #include <stdbool.h>
 #include "input.h"
 
-bool input_read(void);
-
 bool input_read(void)
 {
-        char devname[] = "/dev/input/event3";
+        char devname[] = "/dev/input/event0";
         int device = open(devname, O_RDONLY);
         struct input_event ev;
 
@@ -18,9 +16,13 @@ bool input_read(void)
         {
                 read(device,&ev, sizeof(ev));
 
-                if((ev.code == 114 && ev.value == 1) || (ev.code == 115 && ev.value == 1))
+                if((ev.code == 114 && ev.value == 1) || (ev.code == 115 && ev.value == 1) || (ev.code == 113 && ev.value == 1))
                 {
                     return true;
+                }
+                else if(ev.code == 142 && ev.value == 1)
+                {
+                    system("shutdown -h now");
                 }
         }
 }
