@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "app.h"
 
 void *run_chromium(void *vargp)
