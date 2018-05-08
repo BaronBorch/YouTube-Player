@@ -1,27 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "input1.h"
 #include "gui.h"
 #include "app.h"
 
 void app()
 {
+    FILE *fp;
+	double a, b, d;\
+	int c;
+	char buf[5];
+
+    pthread_t thread_id;
+
+
     while(1)
     {
-    FILE *fp;
-	double a, b, c, d;
-	char buf[3];
-
     if(input_read() == true)
     {
 	fp = popen("amixer get PCM | awk '$0~/%/{print $5}' | tr -d '[dB]'", "r" );
 	d = fscanf(fp, "%lf", &a);
 	b = (a+102.4)*0.94;
+	c = (int)b;
 
-	snprintf(buf, 3, "%f", b);
-	printf( "%s\n", buf); // tymczasowy sprawdzian czy dzia³a jak powinno.
-    gui(b, buf);
+    if(c < 0)
+    {
+        c = 0;
+    }
+    snprintf(buf, 5, "%d", c);
+    printf( "%s\n", buf); // tymczasowy sprawdzian czy dzia³a jak powinno.
+
+    gui(c, buf);
     }
     }
 }
