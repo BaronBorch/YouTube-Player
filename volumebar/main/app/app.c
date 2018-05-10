@@ -32,6 +32,7 @@ void wait(int timeInMs)
     if (n == ETIMEDOUT && e == 1)
     {
         printf("%d\n%s\n", e, "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
+        //gui_hide  // jak będzie dziłało
     }
     else
     {
@@ -93,7 +94,7 @@ void *input_thread(void *vargp)
                 c = 0;
             }
             snprintf(buf, 5, "%d", c);
-            printf( "%s\n%d\n", buf, e); // tymczasowy sprawdzian czy dzia�a jak powinno.
+            printf( "%s\n%d\n", buf, e); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
             gui_start(c, buf);
             draw();
