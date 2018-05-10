@@ -31,11 +31,12 @@ int gui_start(int height, char inscription[5])
 
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
+    //g_signal_connect(window, "window_state_event", G_CALLBACK(gui_hide), NULL);  //działa ciągle
 
     gtk_widget_show_all(window);
 
     g_timeout_add(5, cback, NULL);
-    g_timeout_add(10, gui_hide, NULL);
+    //g_timeout_add(10, gui_hide, NULL);
 
     gtk_main();
 
@@ -96,8 +97,12 @@ gboolean cback(gpointer u)
 
 int gui_hide()
 {
-    gtk_widget_hide(window);    //działa!!!!
-
+    if(window != NULL)
+    {
+        gtk_widget_hide(window);
+        return 0;
+    }
+    return 1;
 }
 
 
