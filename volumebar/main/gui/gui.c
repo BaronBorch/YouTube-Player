@@ -1,48 +1,45 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include "gui.h"
 
-gpointer w;
+GtkWidget *window;
 
-bool gui(int height, char inscription[5]);
+int gui_start(int height, char inscription[5]);
 gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
 gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr);
 gboolean cback(gpointer u);
-gboolean cback2(gpointer w);
+int gui_hide();
 
 int rect_height;
 char value[5];
 
 
-bool gui(int height, char inscription[5])
+int gui_start(int height, char inscription[5])
 {
     rect_height = height*2;
     strncpy(value, inscription, 5);
 
     gtk_init(0, 0);
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_POPUP);
+    window = gtk_window_new(GTK_WINDOW_POPUP);
     gtk_window_move(GTK_WINDOW(window), 1280, 548);
     gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
     gtk_widget_set_app_paintable(window, TRUE);
-    //gpointer w = &window;
+    gpointer w = &window;
 
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
-    //g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(cback2), NULL);
+
     gtk_widget_show_all(window);
 
-    g_timeout_add(20, cback, NULL);
-    //g_timeout_add(10, cback2, NULL);
-
-    //gtk_widget_hide(window);    // dziala, ale musi być przed gtk_main.
-    //gtk_window_close(GTK_WINDOW(window));     //dziala, ale musi być przed gtk_main.
+    g_timeout_add(5, cback, NULL);
+    g_timeout_add(10, gui_hide, NULL);
 
     gtk_main();
 
-    return true;
+    return 0;
 }
 
 gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
@@ -97,17 +94,14 @@ gboolean cback(gpointer u)
     return FALSE;
 }
 
-gboolean cback2(gpointer w)
+int gui_hide()
 {
+    gtk_widget_hide(window);    //działa!!!!
 
-    //g_usleep (2000000);
-    //gtk_widget_destroy(widget);
-    //gtk_widget_hide(widget);
-    //gtk_window_close(GTK_WINDOW(w));
-    cairo_destroy(w);
-
-    return TRUE;
 }
+
+
+
 
 
 
