@@ -2,19 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "gui.h"
 
 GtkWidget *window;
+int rect_height, gui_hided;
+char value[5];
 
 int gui_start(int height, char inscription[5]);
 gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
 gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr);
 gboolean cback(gpointer u);
 int gui_hide();
-
-int rect_height;
-char value[5];
-
 
 int gui_start(int height, char inscription[5])
 {
@@ -35,8 +34,8 @@ int gui_start(int height, char inscription[5])
 
     gtk_widget_show_all(window);
 
+    g_timeout_add(5, gui_hide, NULL);
     g_timeout_add(5, cback, NULL);
-    //g_timeout_add(10, gui_hide, NULL);
 
     gtk_main();
 
@@ -97,10 +96,10 @@ gboolean cback(gpointer u)
 
 int gui_hide()
 {
-    if(window != NULL)
+    if(gui_hided == 1)
     {
         gtk_widget_hide(window);
-        return 0;
+        return 1;
     }
     return 1;
 }

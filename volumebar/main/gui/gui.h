@@ -3,5 +3,6 @@
 
 int gui_start(int height, char inscription[5]);
 int gui_hide();
+int gui_hided;
 
 #endif
