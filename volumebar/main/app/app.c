@@ -16,8 +16,6 @@ pthread_mutex_t Mutex;
 void *wait_thread(void *vargp)
 {
     int timeInMs = 2000;
-    hide_gui_test = 0;
-    gui_hided = 0;
     pthread_mutex_lock(&Mutex);
     struct timeval tv;
     struct timespec ts;
@@ -30,16 +28,26 @@ void *wait_thread(void *vargp)
 
     printf("%s\n", "wait_thread here");
     int n = pthread_mutex_timedlock(&Mutex, &ts);
-    gui_hided = 1;
-    gui_hide();
-    printf("%d\n%s\n", hide_gui_test, "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
-    pthread_mutex_unlock(&Mutex);
-    hide_gui_test = 1;
+
+    if(n == ETIMEDOUT)
+    {
+        gui_hided = 1;
+        printf("%s%d\n", "gui_hided = ", gui_hided);
+        gui_hide();
+        gui_start(converted_volume_val, volume_to_show);
+        gui_hided = 0;
+        printf("%s%d\n%s\n", "gui_hided = ", gui_hided, "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
+        pthread_mutex_unlock(&Mutex);
+    }
+
+    else
+    {
+        wait_thread;
+    }
 }
 
-void app()
+void *read_input(void *vargp)
 {
-    pthread_t thread1;
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
 
@@ -56,11 +64,24 @@ void app()
             {
                 converted_volume_val = 0;
             }
+
             snprintf(volume_to_show, 5, "%d", converted_volume_val);
-            printf( "%s\n%d\n", volume_to_show, hide_gui_test); // tymczasowy sprawdzian czy dzia³a jak powinno.
+            printf( "%s\n%s%d\n", volume_to_show, "gui_hihed = ", gui_hided); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
             gui_start(converted_volume_val, volume_to_show);
-            pthread_mutex_unlock(&Mutex);
+        }
+    }
+}
+
+void app()
+{
+    pthread_t thread1, thread2;
+
+    while(1)
+    {
+        if(input_read() == true)
+        {
+            pthread_create(&thread1, NULL, read_input, NULL);
             pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
