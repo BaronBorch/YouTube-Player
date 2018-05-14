@@ -46,8 +46,9 @@ void *wait_thread(void *vargp)
     }
 }
 
-void *read_input(void *vargp)
+void app()
 {
+    pthread_t thread1;
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
 
@@ -69,19 +70,6 @@ void *read_input(void *vargp)
             printf( "%s\n%s%d\n", volume_to_show, "gui_hihed = ", gui_hided); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
             gui_start(converted_volume_val, volume_to_show);
-        }
-    }
-}
-
-void app()
-{
-    pthread_t thread1, thread2;
-
-    while(1)
-    {
-        if(input_read() == true)
-        {
-            pthread_create(&thread1, NULL, read_input, NULL);
             pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
