@@ -12,6 +12,7 @@
 int converted_volume_val, hide_gui_test = 0;
 char volume_to_show[5];
 pthread_mutex_t Mutex;
+pthread_t thread1;
 
 void *wait_thread(void *vargp)
 {
@@ -32,11 +33,8 @@ void *wait_thread(void *vargp)
 
     if(n == ETIMEDOUT && hide_gui_test == 1)
     {
-        set_gui_hided(1);
         gui_hide();
-        set_gui_hided(0);
         printf("%s\n", "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
-        pthread_mutex_unlock(&Mutex);
     }
 
     else
@@ -47,7 +45,6 @@ void *wait_thread(void *vargp)
 
 void app()
 {
-    pthread_t thread1;
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
     gui_init();
@@ -68,9 +65,12 @@ void app()
 
             snprintf(volume_to_show, 5, "%d", converted_volume_val);
             printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
+
             hide_gui_test = 0;
+            pthread_mutex_unlock(&Mutex);
+
             gui_show(converted_volume_val, volume_to_show);
-            //pthread_create(&thread1, NULL, wait_thread, NULL);
+            pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
 }
