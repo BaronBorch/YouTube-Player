@@ -9,39 +9,6 @@ GtkWidget *window;
 int rect_height, gui_hided;
 char value[5];
 
-int gui_start(int height, char inscription[5]);
-gboolean draw_rect(GtkWidget *widget, cairo_t *new_cr);
-gboolean draw_rect2(GtkWidget *widget, cairo_t *new_cr);
-gboolean cback(gpointer u);
-int gui_hide();
-
-int gui_start(int height, char inscription[5])
-{
-    rect_height = height*2;
-    strncpy(value, inscription, 5);
-
-    gtk_init(0, 0);
-
-    window = gtk_window_new(GTK_WINDOW_POPUP);
-    gtk_window_move(GTK_WINDOW(window), 1280, 548);
-    gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
-    gtk_widget_set_app_paintable(window, TRUE);
-    gpointer w = &window;
-
-    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
-    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
-    //g_signal_connect(window, "window_state_event", G_CALLBACK(gui_hide), NULL);  //działa ciągle
-
-    gtk_widget_show_all(window);
-
-    g_timeout_add(5, gui_hide, NULL);
-    g_timeout_add(5, cback, NULL);
-
-    gtk_main();
-
-    return 0;
-}
-
 gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 {
     GdkRGBA color;
@@ -94,18 +61,43 @@ gboolean cback(gpointer u)
     return FALSE;
 }
 
-int gui_hide()
+void set_gui_hided(int gui_hided_init)
+{
+    gui_hided = gui_hided_init;
+}
+
+void gui_hide()
 {
     if(gui_hided == 1)
     {
+        gtk_init(0, 0);
         gtk_widget_hide(window);
-        return 1;
+        g_timeout_add(5, cback, NULL);
+        gtk_main();
     }
-    return 1;
 }
 
+void gui_show(int height, char inscription[5])
+{
+    if(gui_hided == 0)
+    {
+        rect_height = height*2;
+        strncpy(value, inscription, 5);
 
+        gtk_init(0, 0);
 
+        window = gtk_window_new(GTK_WINDOW_POPUP);
+        gtk_window_move(GTK_WINDOW(window), 1280, 548);
+        gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
+        gtk_widget_set_app_paintable(window, TRUE);
 
+        g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
+        g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
 
+        gtk_widget_show_all(window);
 
+        g_timeout_add(10, cback, NULL);
+
+        gtk_main();
+    }
+}
