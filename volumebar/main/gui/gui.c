@@ -12,6 +12,7 @@ char value[5];
 gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 {
     GdkRGBA color;
+
     cairo_rectangle(cr, 0, 0, 60, 200);
     gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
     cairo_set_source_rgba (cr, 0.1, 0.2, 0.9, 1.0);
@@ -23,15 +24,13 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 {
     int gap, max_rect_height = 200;
-
     gap = max_rect_height - rect_height;
-
     GdkRGBA color;
+
     cairo_rectangle(cr, 0, gap, 60, rect_height);
     gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
     cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 1.0);
     cairo_fill (cr);
-
     cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size (cr, 29.0);
 
@@ -95,7 +94,7 @@ void gui_show(int height, char inscription[5])
         g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
 
         gtk_widget_show_all(window);
-
+        
         g_timeout_add(10, cback, NULL);
 
         gtk_main();
