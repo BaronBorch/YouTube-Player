@@ -65,6 +65,19 @@ void set_gui_hided(int gui_hided_init)
     gui_hided = gui_hided_init;
 }
 
+void gui_init()
+{
+        gtk_init(0, 0);
+        window = gtk_window_new(GTK_WINDOW_POPUP);
+        gtk_window_move(GTK_WINDOW(window), 1280, 548);
+        gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
+        gtk_widget_set_app_paintable(window, TRUE);
+
+        g_timeout_add(10, cback, NULL);
+
+        gtk_main();
+}
+
 void gui_hide()
 {
     if(gui_hided == 1)
@@ -83,20 +96,14 @@ void gui_show(int height, char inscription[5])
         rect_height = height*2;
         strncpy(value, inscription, 5);
 
-        gtk_init(0, 0);
-
-        window = gtk_window_new(GTK_WINDOW_POPUP);
-        gtk_window_move(GTK_WINDOW(window), 1280, 548);
-        gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
-        gtk_widget_set_app_paintable(window, TRUE);
-
+        //gtk_widget_hide(window);
         g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
         g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
 
-        gtk_widget_show_all(window);
-        
+        gtk_init(0, 0);
+        gtk_widget_show_now(window);
         g_timeout_add(10, cback, NULL);
-
         gtk_main();
     }
 }
+
