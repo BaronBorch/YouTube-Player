@@ -50,6 +50,7 @@ void app()
     pthread_t thread1;
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
+    gui_init();
 
     while(1)
     {
@@ -68,10 +69,8 @@ void app()
             snprintf(volume_to_show, 5, "%d", converted_volume_val);
             printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
             hide_gui_test = 0;
-            set_gui_hided(0);
             gui_show(converted_volume_val, volume_to_show);
-            set_gui_hided(1);
-            pthread_create(&thread1, NULL, wait_thread, NULL);
+            //pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
 }
