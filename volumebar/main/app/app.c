@@ -5,7 +5,6 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <errno.h>
-#include <unistd.h>
 #include "input.h"
 #include "gui.h"
 #include "app.h"
@@ -62,7 +61,7 @@ void app()
             printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
             pthread_mutex_unlock(&Mutex);
-            gui_show(converted_volume_val, volume_to_show);
+            gui_show_volumebar(converted_volume_val, volume_to_show);
             pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
