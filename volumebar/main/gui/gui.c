@@ -90,7 +90,7 @@ void gui_hide()
     }
 }
 
-void gui_show(int height, char inscription[5])
+void gui_show_volumebar(int height, char inscription[5])
 {
     rect_height = height*2;
     strncpy(value, inscription, 5);
