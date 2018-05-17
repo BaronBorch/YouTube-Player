@@ -1,3 +1,11 @@
+#define key ev.code
+#define pressed ev.value
+#define up 0
+#define hold 2
+#define mute 113
+#define volume_down 114
+#define volume_up 115
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -8,23 +16,25 @@
 
 bool input_read(void)
 {
-        char devname[] = "/dev/input/event0";
-        int device = open(devname, O_RDONLY);
-        struct input_event ev;
+    char devname[] = "/dev/input/event0";
+    int device = open(devname, O_RDONLY);
+    struct input_event ev;
 
-        while(1)
+    while(1)
+    {
+        read(device,&ev, sizeof(ev));
+
+        if((key == volume_down && pressed == up) || (key == volume_up && pressed == up) || (key == mute && pressed == up))
         {
-                read(device,&ev, sizeof(ev));
-
-                if((ev.code == 114 && ev.value == 1) || (ev.code == 115 && ev.value == 1) || (ev.code == 113 && ev.value == 1))
-                {
-                    return true;
-                }
-                else if(ev.code == 142 && ev.value == 1)
-                {
-                    system("shutdown -h now");
-                }
+            return true;
         }
+        else if((key == volume_down && pressed == hold) || (key == volume_up && pressed == hold) || (key == mute && pressed == hold))
+        {
+            return true;
+        }
+        else if(key == 142 && pressed == up)
+        {
+            system("shutdown -h now");
+        }
+    }
 }
-
-
