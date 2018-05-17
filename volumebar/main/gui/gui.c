@@ -73,6 +73,9 @@ void gui_init()
     gtk_window_move(GTK_WINDOW(window), 1280, 548);
     gtk_window_set_default_size(GTK_WINDOW(window), 60, 200);
     gtk_widget_set_app_paintable(window, TRUE);
+
+    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
+    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
 }
 
 void gui_hide()
@@ -92,9 +95,6 @@ void gui_show(int height, char inscription[5])
     rect_height = height*2;
     strncpy(value, inscription, 5);
     gui_hided = 0;
-
-    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
-    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
 
     gtk_widget_queue_draw(window);
     gtk_widget_set_visible(window, TRUE);
