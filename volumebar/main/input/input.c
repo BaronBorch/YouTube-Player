@@ -1,10 +1,5 @@
 #define key ev.code
 #define pressed ev.value
-#define up 0
-#define hold 2
-#define mute 113
-#define volume_down 114
-#define volume_up 115
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -24,15 +19,15 @@ bool input_read(void)
     {
         read(device,&ev, sizeof(ev));
 
-        if((key == volume_down && pressed == up) || (key == volume_up && pressed == up) || (key == mute && pressed == up))
+        if((key == KEY_VOLUMEDOWN && pressed == 0) || (key == KEY_VOLUMEUP && pressed == 0) || (key == KEY_MUTE && pressed == 0))
         {
             return true;
         }
-        else if((key == volume_down && pressed == hold) || (key == volume_up && pressed == hold) || (key == mute && pressed == hold))
+        else if((key == KEY_VOLUMEDOWN && pressed == 2) || (key == KEY_VOLUMEUP && pressed == 2) || (key == KEY_MUTE && pressed == 2))
         {
             return true;
         }
-        else if(key == 142 && pressed == up)
+        else if(key == KEY_SLEEP && pressed == 0)
         {
             system("shutdown -h now");
         }
