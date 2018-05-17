@@ -5,20 +5,20 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <unistd.h>
 #include "input.h"
 #include "gui.h"
 #include "app.h"
 
-int converted_volume_val, hide_gui_test = 0;
+int converted_volume_val;
 char volume_to_show[5];
-pthread_mutex_t Mutex;
+pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_t thread1;
 
 void *wait_thread(void *vargp)
 {
-    hide_gui_test = 1;
     int timeInMs = 2000;
-    pthread_mutex_lock(&Mutex);
+    pthread_mutex_trylock(&Mutex);
     struct timeval tv;
     struct timespec ts;
 
@@ -31,15 +31,10 @@ void *wait_thread(void *vargp)
     printf("%s\n", "wait_thread here");
     int n = pthread_mutex_timedlock(&Mutex, &ts);
 
-    if(n == ETIMEDOUT && hide_gui_test == 1)
+    if(n == ETIMEDOUT)
     {
         gui_hide();
         printf("%s\n", "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
-    }
-
-    else
-    {
-        wait_thread;
     }
 }
 
@@ -66,11 +61,10 @@ void app()
             snprintf(volume_to_show, 5, "%d", converted_volume_val);
             printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
-            hide_gui_test = 0;
             pthread_mutex_unlock(&Mutex);
-
             gui_show(converted_volume_val, volume_to_show);
             pthread_create(&thread1, NULL, wait_thread, NULL);
         }
     }
+    pthread_mutex_destroy(&Mutex);
 }
