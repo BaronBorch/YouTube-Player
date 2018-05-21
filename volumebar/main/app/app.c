@@ -5,6 +5,8 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <signal.h>
+#include <unistd.h>
 #include "input.h"
 #include "gui.h"
 #include "app.h"
@@ -12,7 +14,7 @@
 int converted_volume_val;
 char volume_to_show[5];
 pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_t thread1;
+pthread_t thread1, thread2;
 
 void *wait_thread(void *vargp)
 {
@@ -37,15 +39,22 @@ void *wait_thread(void *vargp)
     }
 }
 
+void *inputt(void *vargp)
+{
+    input_read();
+}
+
 void app()
 {
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
+
     gui_init();
+    pthread_create(&thread2, NULL, inputt, NULL);
 
     while(1)
     {
-        if(input_read() == true)
+        if(volume_changed_callback() == true)
         {
             file_p = popen("amixer get PCM | awk '$0~/%/{print $5}' | tr -d '[dB]'", "r" );
             convert_file = fscanf(file_p, "%lf", &read_vol);
