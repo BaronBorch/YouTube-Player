@@ -1,6 +1,8 @@
 #ifndef input_H
 #define input_H
 
-bool input_read(void);
+typedef bool (*event_cb)();
+void input_read(void);
+event_cb volume_changed_callback;
 
 #endif

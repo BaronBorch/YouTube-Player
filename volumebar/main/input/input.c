@@ -1,5 +1,4 @@
 #define key ev.code
-#define pressed ev.value
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -9,7 +8,22 @@
 #include <stdbool.h>
 #include "input.h"
 
-bool input_read(void)
+int c;
+
+bool my_callback()
+{
+    if(c == 1) {return true;}
+    else {return false;}
+}
+
+event_cb volume_changed_callback = my_callback;
+
+bool volume_change_register(event_cb cb)
+{
+    volume_changed_callback = cb;
+}
+
+void input_read(void)
 {
     char devname[] = "/dev/input/event0";
     int device = open(devname, O_RDONLY);
@@ -17,19 +31,19 @@ bool input_read(void)
 
     while(1)
     {
+        c = 0;
         read(device,&ev, sizeof(ev));
 
-        if((key == KEY_VOLUMEDOWN && pressed == 0) || (key == KEY_VOLUMEUP && pressed == 0) || (key == KEY_MUTE && pressed == 0))
+        switch(key)
         {
-            return true;
-        }
-        else if((key == KEY_VOLUMEDOWN && pressed == 2) || (key == KEY_VOLUMEUP && pressed == 2) || (key == KEY_MUTE && pressed == 2))
-        {
-            return true;
-        }
-        else if(key == KEY_SLEEP && pressed == 0)
-        {
-            system("shutdown -h now");
+            case KEY_VOLUMEDOWN: {c = 1; volume_change_register(my_callback);}
+            break;
+            case KEY_VOLUMEUP: {c = 1; volume_change_register(my_callback);}
+            break;
+            case KEY_MUTE: {c = 1; volume_change_register(my_callback);}
+            break;
+            case KEY_SLEEP: system("shutdown -h now");
+            break;
         }
     }
 }
