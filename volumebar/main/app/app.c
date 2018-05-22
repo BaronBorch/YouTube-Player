@@ -14,7 +14,7 @@
 int converted_volume_val;
 char volume_to_show[5];
 pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_t thread1, thread2;
+pthread_t thread1;
 
 void *wait_thread(void *vargp)
 {
@@ -39,40 +39,43 @@ void *wait_thread(void *vargp)
     }
 }
 
-void *inputt(void *vargp)
-{
-    input_read();
-}
-
-void app()
+void handle_volume_change()
 {
     FILE *file_p;
     double read_vol, convert_vol, convert_file;
 
-    gui_init();
-    pthread_create(&thread2, NULL, inputt, NULL);
+    file_p = popen("amixer get PCM | awk '$0~/%/{print $5}' | tr -d '[dB]'", "r" );
+    convert_file = fscanf(file_p, "%lf", &read_vol);
+    convert_vol = (read_vol+102.4)*0.94;
+    converted_volume_val = (int)convert_vol;
 
-    while(1)
+    if(converted_volume_val < 0)
     {
-        if(volume_changed_callback() == true)
-        {
-            file_p = popen("amixer get PCM | awk '$0~/%/{print $5}' | tr -d '[dB]'", "r" );
-            convert_file = fscanf(file_p, "%lf", &read_vol);
-            convert_vol = (read_vol+102.4)*0.94;
-            converted_volume_val = (int)convert_vol;
-
-            if(converted_volume_val < 0)
-            {
-                converted_volume_val = 0;
-            }
-
-            snprintf(volume_to_show, 5, "%d", converted_volume_val);
-            printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
-
-            pthread_mutex_unlock(&Mutex);
-            gui_show_volumebar(converted_volume_val, volume_to_show);
-            pthread_create(&thread1, NULL, wait_thread, NULL);
-        }
+        converted_volume_val = 0;
     }
-    pthread_mutex_destroy(&Mutex);
+
+    snprintf(volume_to_show, 5, "%d", converted_volume_val);
+    printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
+
+    pthread_mutex_unlock(&Mutex);
+    gui_show_volumebar(converted_volume_val, volume_to_show);
+    pthread_create(&thread1, NULL, wait_thread, NULL);
+}
+
+void set_HDMI()
+{
+    system("shutdown -h now");// Wkrótce będzie tu HDMI on/off
+}
+
+void app()
+{
+    gui_init();
+    input_read_start();
+
+    register_volume_up_callback(handle_volume_change);
+    register_volume_down_callback(handle_volume_change);
+    register_volume_mute_callback(handle_volume_change);
+    register_power_callback(set_HDMI);
+
+    //pthread_mutex_destroy(&Mutex);
 }
