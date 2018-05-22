@@ -11,23 +11,34 @@
 
 
 pthread_t thread;
-event_cb global_cb;
+event_cb key_volume_up_cb;
+event_cb key_volume_down_cb;
+event_cb key_mute_cb;
+event_cb key_power_cb;
 
 void register_volume_up_callback(event_cb a)
 {
-    global_cb = a;
+    key_volume_up_cb = a;
 }
 void register_volume_down_callback(event_cb a)
 {
-    global_cb = a;
+    key_volume_down_cb = a;
 }
 void register_volume_mute_callback(event_cb a)
 {
-    global_cb = a;
+    key_mute_cb = a;
 }
 void register_power_callback(event_cb a)
 {
-    global_cb = a;
+    key_power_cb = a;
+}
+
+void call_callback(event_cb a)
+{
+    if(a != NULL)
+    {
+        a();
+    }
 }
 
 void *input_read(void *vargp)
@@ -42,13 +53,13 @@ void *input_read(void *vargp)
 
         switch(key)
         {
-            case KEY_VOLUMEDOWN: global_cb(register_volume_down_callback);
+            case KEY_VOLUMEUP: call_callback(key_volume_up_cb);
             break;
-            case KEY_VOLUMEUP: global_cb(register_volume_up_callback);
+            case KEY_VOLUMEDOWN: call_callback(key_volume_down_cb);
             break;
-            case KEY_MUTE: global_cb(register_volume_mute_callback);
+            case KEY_MUTE: call_callback(key_mute_cb);
             break;
-            case KEY_SLEEP: global_cb(register_power_callback);
+            case KEY_SLEEP: call_callback(key_power_cb);
             break;
         }
     }
