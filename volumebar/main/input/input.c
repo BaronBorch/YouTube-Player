@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include "input.h"
 
-event_cb global_callback = register_volume_up_callback;
+
 pthread_t thread;
 
 void register_volume_up_callback(event_cb a)
@@ -43,7 +43,10 @@ void register_power_callback(event_cb a)
 
 void call_callback(event_cb a)
 {
-global_callback = a;
+    if(a != NULL)
+    {
+    a();
+    }
 }
 
 void *input_read(void *vargp)
@@ -58,13 +61,13 @@ void *input_read(void *vargp)
 
         switch(key)
         {
-            case KEY_VOLUMEDOWN: {call_callback(register_volume_down_callback); if(global_callback != NULL) {global_callback();}}
+            case KEY_VOLUMEDOWN: call_callback(register_volume_down_callback);
             break;
-            case KEY_VOLUMEUP: {call_callback(register_volume_up_callback); global_callback();}
+            case KEY_VOLUMEUP: call_callback(register_volume_up_callback);
             break;
-            case KEY_MUTE: {call_callback(register_volume_mute_callback); global_callback();}
+            case KEY_MUTE: call_callback(register_volume_mute_callback);
             break;
-            case KEY_SLEEP: {call_callback(register_power_callback); global_callback();}
+            case KEY_SLEEP: call_callback(register_power_callback);
             break;
         }
     }
