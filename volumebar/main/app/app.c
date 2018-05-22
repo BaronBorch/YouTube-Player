@@ -13,11 +13,17 @@
 
 int converted_volume_val;
 char volume_to_show[5];
-pthread_mutex_t Mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t Mutex;
 pthread_t thread1;
+
+void foo_init()
+{
+    pthread_mutex_init(&Mutex, NULL);
+}
 
 void *wait_thread(void *vargp)
 {
+    printf("%s\n", "thread start here");
     int timeInMs = 2000;
     pthread_mutex_trylock(&Mutex);
     struct timeval tv;
@@ -34,7 +40,7 @@ void *wait_thread(void *vargp)
 
     if(n == ETIMEDOUT)
     {
-        gui_hide();
+        //gui_hide();
         printf("%s\n", "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
     }
 }
@@ -58,7 +64,7 @@ void handle_volume_change()
     printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
 
     pthread_mutex_unlock(&Mutex);
-    gui_show_volumebar(converted_volume_val, volume_to_show);
+    //gui_show_volumebar(converted_volume_val, volume_to_show);
     pthread_create(&thread1, NULL, wait_thread, NULL);
 }
 
@@ -69,7 +75,7 @@ void set_HDMI()
 
 void app()
 {
-    gui_init();
+    //gui_init();
     input_read_start();
 
     register_volume_up_callback(handle_volume_change);
