@@ -1,4 +1,5 @@
 #define key ev.code
+#define key_state ev.value
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -8,7 +9,6 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include "input.h"
-
 
 pthread_t thread;
 event_cb key_volume_up_cb;
@@ -53,13 +53,21 @@ void *input_read(void *vargp)
 
         switch(key)
         {
-            case KEY_VOLUMEUP: call_callback(key_volume_up_cb);
+            case KEY_VOLUMEUP:
+            if(key_state != 1)
+            {call_callback(key_volume_up_cb);}
             break;
-            case KEY_VOLUMEDOWN: call_callback(key_volume_down_cb);
+            case KEY_VOLUMEDOWN:
+            if(key_state != 1)
+            {call_callback(key_volume_down_cb);}
             break;
-            case KEY_MUTE: call_callback(key_mute_cb);
+            case KEY_MUTE:
+            if(key_state != 1)
+            {call_callback(key_mute_cb);}
             break;
-            case KEY_SLEEP: call_callback(key_power_cb);
+            case KEY_SLEEP:
+            if(key_state != 1)
+            {call_callback(key_power_cb);}
             break;
         }
     }
