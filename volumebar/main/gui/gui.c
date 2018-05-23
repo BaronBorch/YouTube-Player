@@ -27,7 +27,6 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     gap = max_rect_height - rect_height;
     GdkRGBA color;
 
-
     cairo_rectangle(cr, 0, gap, 60, rect_height);
     gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
     cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 1.0);
