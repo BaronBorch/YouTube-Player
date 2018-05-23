@@ -1,22 +1,31 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <pthread.h>
 #include <unistd.h>
 #include "app.h"
 
-    pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-    pthread_t thread;
+pthread_t thread;
 
 void *run_chromium(void *vargp)
 {
-    pthread_mutex_lock(&lock);
-    //system("chromium-browser --start-fullscreen youtube.com/tv");
-
+    system("chromium-browser --start-fullscreen youtube.com/tv");
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    pthread_create(&thread, NULL, run_chromium, NULL);
-    app();
-    pthread_join(thread, NULL);
-    return 0;
+    if(strcmp ("test", argv[1]) == 0)
+    {
+        printf("%s\n", "test mode, chromium won't start");
+        app();
+        pthread_join(thread, NULL);
+        return 0;
+    }
+    else
+    {
+        pthread_create(&thread, NULL, run_chromium, NULL);
+        app();
+        pthread_join(thread, NULL);
+        return 0;
+    }
 }
