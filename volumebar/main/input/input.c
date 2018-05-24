@@ -52,24 +52,18 @@ void *input_read(void *vargp)
         read(device,&ev, sizeof(ev));
 
         switch(key)
-        {
-            case KEY_VOLUMEUP:
+
             if(key_state != 1)
-            {call_callback(key_volume_up_cb);}
-            break;
-            case KEY_VOLUMEDOWN:
-            if(key_state != 1)
-            {call_callback(key_volume_down_cb);}
-            break;
-            case KEY_MUTE:
-            if(key_state != 1)
-            {call_callback(key_mute_cb);}
-            break;
-            case KEY_SLEEP:
-            if(key_state != 1)
-            {call_callback(key_power_cb);}
-            break;
-        }
+            {
+                case KEY_VOLUMEUP: call_callback(key_volume_up_cb);
+                break;
+                case KEY_VOLUMEDOWN: call_callback(key_volume_down_cb);
+                break;
+                case KEY_MUTE: call_callback(key_mute_cb);
+                break;
+                case KEY_SLEEP: call_callback(key_power_cb);
+                break;
+            }
     }
 }
 
