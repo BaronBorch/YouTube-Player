@@ -76,9 +76,13 @@ void set_HDMI()
     read_display_state = fscanf(file_d, "%li", &display_state);
 
     if(display_state == 1)
-    {system("sudo vcgencmd display_power 0");}
+    {
+        system("sudo vcgencmd display_power 0");
+    }
     else
-    {system("sudo vcgencmd display_power 1");}
+    {
+        system("sudo vcgencmd display_power 1");
+    }
     pclose(file_d);
 }
 
