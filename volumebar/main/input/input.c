@@ -1,5 +1,6 @@
 #define key ev.code
 #define key_state ev.value
+#define key_release 0
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -43,7 +44,7 @@ void call_callback(event_cb a)
 
 void *input_read(void *vargp)
 {
-    char devname[] = "/dev/input/event0";
+    char devname[] = "/dev/input/by-id/usb-flirc.tv_flirc-if01-event-kbd";
     int device = open(devname, O_RDONLY);
     struct input_event ev;
 
@@ -52,18 +53,31 @@ void *input_read(void *vargp)
         read(device,&ev, sizeof(ev));
 
         switch(key)
-
-            if(key_state != 1)
+        {
+            case KEY_VOLUMEUP: if(key_state != key_release)
             {
-                case KEY_VOLUMEUP: call_callback(key_volume_up_cb);
-                break;
-                case KEY_VOLUMEDOWN: call_callback(key_volume_down_cb);
-                break;
-                case KEY_MUTE: call_callback(key_mute_cb);
-                break;
-                case KEY_SLEEP: call_callback(key_power_cb);
-                break;
+                call_callback(key_volume_up_cb);
             }
+            break;
+
+            case KEY_VOLUMEDOWN: if(key_state != key_release)
+            {
+                call_callback(key_volume_down_cb);
+            }
+            break;
+
+            case KEY_MUTE: if(key_state != key_release)
+            {
+                call_callback(key_mute_cb);
+            }
+            break;
+
+            case KEY_SLEEP: if(key_state != key_release)
+            {
+                call_callback(key_power_cb);
+            }
+            break;
+        }
     }
 }
 
