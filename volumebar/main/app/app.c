@@ -77,11 +77,11 @@ void set_HDMI()
 
     if(display_state == 1)
     {
-        system("sudo vcgencmd display_power 0");
+        system("vcgencmd display_power 0");
     }
     else
     {
-        system("sudo vcgencmd display_power 1");
+        system("vcgencmd display_power 1");
     }
     pclose(file_d);
 }
