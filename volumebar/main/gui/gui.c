@@ -11,26 +11,41 @@ char value[5];
 
 gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
 {
-    GdkRGBA color;
+    int img_width = 60, img_height = 200;
+    cairo_surface_t *image;
 
     cairo_rectangle(cr, 0, 0, 60, 200);
-    gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
-    cairo_set_source_rgba (cr, 0.1, 0.2, 0.9, 1.0);
-    cairo_fill (cr);
+    cairo_clip (cr);
+    cairo_new_path (cr);
+    image = cairo_image_surface_create_from_png ("/home/pi/project/main/volumebar_red.png");
+    img_width = cairo_image_surface_get_width (image);
+    img_height = cairo_image_surface_get_height (image);
+    cairo_set_source_surface (cr, image, 0, 0);
+    cairo_paint (cr);
 
     return FALSE;
 }
 
 gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
 {
-    int gap, max_rect_height = 200;
+    int gap, max_rect_height = 200, img_width = 60;
     gap = max_rect_height - rect_height;
-    GdkRGBA color;
+    cairo_surface_t *image;
 
     cairo_rectangle(cr, 0, gap, 60, rect_height);
-    gtk_style_context_get_color (gtk_widget_get_style_context (widget), 0, &color);
-    cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 1.0);
-    cairo_fill (cr);
+    cairo_clip (cr);
+    cairo_new_path (cr);
+    image = cairo_image_surface_create_from_png ("/home/pi/project/main/volumebar_blue.png");
+    img_width = cairo_image_surface_get_width (image);
+    max_rect_height = cairo_image_surface_get_height (image);
+    cairo_set_source_surface (cr, image, 0, 0);
+    cairo_paint (cr);
+
+    return FALSE;
+}
+
+gboolean draw_vol_value (GtkWidget *widget, cairo_t *cr)
+{
     cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size (cr, 29.0);
 
@@ -48,8 +63,8 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     }
 
     cairo_text_path (cr, value);
-    cairo_set_source_rgb (cr, 1, 0.3, 0);
-    cairo_fill_preserve (cr);
+    cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 1);
+    cairo_fill_preserve(cr);
 
     return FALSE;
 }
@@ -75,6 +90,7 @@ void gui_init()
 
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
+    g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_vol_value), NULL);
 }
 
 void gui_hide()
