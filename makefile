@@ -1,11 +1,11 @@
 YTPlayer: gui.o input.o app.o main.o clean
-	gcc -o YTPlayer gui/gui.c input/input.c app/app.c main.c -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
+	gcc -o YTPlayer app/gui/gui.c app/input/input.c app/app.c main.c -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
-gui.o: gui/gui.c
-	gcc -c gui/gui.c `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
+gui.o: app/gui/gui.c
+	gcc -c app/gui/gui.c `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
-input.o: input/input.c 
-	gcc -c input/input.c
+input.o: app/input/input.c 
+	gcc -c app/input/input.c
 
 app.o: app/app.c
 	gcc -c app/app.c

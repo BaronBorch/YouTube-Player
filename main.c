@@ -3,7 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "app.h"
+#include "app/app.h"
 
 pthread_t thread;
 

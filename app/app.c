@@ -7,8 +7,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <unistd.h>
-#include "input.h"
-#include "gui.h"
+#include "input/input.h"
+#include "gui/gui.h"
 #include "app.h"
 
 static pthread_mutex_t Mutex;
