@@ -1,10 +1,17 @@
-csrc =  $(wildcard app/app.c)\
-	$(wildcard gui/gui.c)\
-	$(wildcard input/input.c)\
-	$(wildcard main.c)\
-obj = $(csrc:.c=.o)
+YTPlayer: gui.o input.o app.o main.o clean
+	gcc -o YTPlayer gui/gui.c input/input.c app/app.c main.c -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
-CFLAGS = -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
+gui.o: gui/gui.c
+	gcc -c gui/gui.c `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
-YTPlayer: $(obj)
-	$(GCC) -o $@ $^ $(CFLAGS)
+input.o: input/input.c 
+	gcc -c input/input.c
+
+app.o: app/app.c
+	gcc -c app/app.c
+
+main.o: main.c
+	gcc -c main/main.c
+
+clean: 
+	rm gui.o input.o app.o main.o
