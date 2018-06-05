@@ -11,7 +11,7 @@ app.o: app/app.c
 	gcc -c app/app.c
 
 main.o: main.c
-	gcc -c main/main.c
+	gcc -c main.c
 
 clean: 
 	rm gui.o input.o app.o main.o
