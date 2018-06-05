@@ -63,8 +63,11 @@ gboolean draw_vol_value (GtkWidget *widget, cairo_t *cr)
     }
 
     cairo_text_path (cr, value);
-    cairo_set_source_rgba (cr, 0.1, 0.6, 0.1, 1);
+    cairo_set_source_rgba (cr, 0, 0, 0, 1);
     cairo_fill_preserve(cr);
+    cairo_set_source_rgb (cr, 1, 1, 1);
+    cairo_set_line_width (cr, 0.5);
+    cairo_stroke (cr);
 
     return FALSE;
 }
