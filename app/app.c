@@ -39,17 +39,18 @@ void *wait_thread(void *vargp)
         gui_hide();
         printf("%s\n", "HIDEEeeeeeeeeeeeeeeeeeeeeeeeeeeEE");
     }
+    return 0;
 }
 
 void handle_volume_change()
 {
     FILE *file_p;
-    double read_vol, convert_vol, convert_file;
+    double read_vol, convert_vol;
     int converted_volume_val;
     char volume_to_show[5];
 
     file_p = popen("amixer get PCM | awk '$0~/%/{print $5}' | tr -d '[dB]'", "r" );
-    convert_file = fscanf(file_p, "%lf", &read_vol);
+    fscanf(file_p, "%lf", &read_vol);
     convert_vol = (read_vol+102.4)*0.94;
     converted_volume_val = (int)convert_vol;
     pclose(file_p);
@@ -71,9 +72,9 @@ void handle_volume_change()
 void set_HDMI()
 {
     FILE *file_d;
-    int read_display_state, display_state;
+    int display_state;
     file_d = popen("sudo vcgencmd display_power | tr -cd [:digit:]", "r");
-    read_display_state = fscanf(file_d, "%li", &display_state);
+    fscanf(file_d, "%i", &display_state);
 
     if(display_state == 1)
     {
@@ -86,11 +87,49 @@ void set_HDMI()
     pclose(file_d);
 }
 
+void check_wpa_connect()
+{
+    FILE *file_e;
+    char wpa_state[10];
+
+    file_e = popen("wpa_cli status | grep 'wpa_state=' | tr -d '[wpa_state=]'", "r" );
+    fscanf(file_e, "%s", wpa_state);
+    printf("%s\n", wpa_state);
+    pclose(file_e);
+
+    if(strcmp("COMPLETED", wpa_state) == 0)
+    {
+        printf("%s\n", "WiFi conected");
+        draw_statement("WiFi conected");
+    }
+
+    else if(strcmp("DISCONNECTED", wpa_state) == 0)
+    {
+        printf("%s\n", "Wciśnij przycisk WPS na routerze");
+        draw_st_disconnect("WiFi not connected");
+    }
+
+    else
+    {
+        printf("%s\n", "Wystąpił błąd :(");
+    }
+}
+
+void wps_connect()
+{
+    system("wpa_cli interface wlan0 wps_pbc");
+    printf("%s\n", "wps connect here, trying to connect");
+    sleep(2);
+    check_wpa_connect();
+}
+
 void app()
 {
     gui_init();
+    check_wpa_connect();
     input_read_start();
 
+    register_wps_connect_callback(wps_connect);
     register_volume_up_callback(handle_volume_change);
     register_volume_down_callback(handle_volume_change);
     register_volume_mute_callback(handle_volume_change);
