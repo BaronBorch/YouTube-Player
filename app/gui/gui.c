@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 #include "gui.h"
 
 GtkWidget *window, *window1, *window2, *window3, *spin;
 gboolean active;
-int rect_height, gui_hided, window_active;
+int rect_height, gui_hided, window_active, a;
 char value[5];
 
 gboolean cback(gpointer u)
@@ -23,7 +22,7 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, 0, 60, 200);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("app/gui/volumebar_background_img.png");
+    image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_background_img.png");
     cairo_image_surface_get_height (image);
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
@@ -39,7 +38,7 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, gap, 60, rect_height);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("app/gui/volumebar_foreground_img.png");
+    image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_foreground_img.png");
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
 
@@ -111,42 +110,9 @@ void gui_show_volumebar(int height, char inscription[5])
     gtk_main();
 }
 
-void draw_statement(char statement[40])
+void draw_statement(char statement[40], int wps_dc)
 {
-    GtkWidget *fixed, *button, *label; 
-
-    g_object_get (GTK_SPINNER (spin), "active", &active, NULL);
-    if(active)
-    {
-        gtk_spinner_stop (GTK_SPINNER (spin));
-        if(window_active == 3)
-        {
-            gtk_widget_destroy(window3);
-        }
-    }
-
-    window_active = 1;
-    gtk_init(0, 0);
-    window1 = gtk_window_new(GTK_WINDOW_POPUP);
-    fixed = gtk_fixed_new();
-    label = gtk_label_new(NULL);
-    button = gtk_button_new_with_label("OK");
-
-    gtk_window_set_default_size(GTK_WINDOW(window1), 1380, 768);
-    gtk_container_add(GTK_CONTAINER(window1), fixed);
-    gtk_label_set_markup(GTK_LABEL(label), statement);
-    gtk_fixed_put (GTK_FIXED (fixed), label, 590, 345);
-    gtk_fixed_put (GTK_FIXED (fixed), button, 645, 385);
-
-    g_timeout_add(50, cback, NULL);
-    gtk_widget_set_visible(window1, TRUE);
-    gtk_widget_show_all(window1);
-    gtk_main();
-}
-
-void draw_st_disconnect(char statement[40])
-{
-    GtkWidget *fixed, *button, *label, *label1; 
+    GtkWidget *fixed, *button, *label, *label1;
 
     g_object_get (GTK_SPINNER (spin), "active", &active, NULL);
     if(active)
@@ -165,15 +131,19 @@ void draw_st_disconnect(char statement[40])
     label = gtk_label_new(NULL);
     label1 = gtk_label_new(NULL);
     button = gtk_button_new_with_label("OK");
+    a = strlen(statement);
+
+    if(wps_dc == 1)
+    {
+    gtk_label_set_markup(GTK_LABEL(label1), "To connect press WPS button on your router and press OK");
+    }
 
     gtk_window_set_default_size(GTK_WINDOW(window2), 1380, 768);
     gtk_container_add(GTK_CONTAINER(window2), fixed);
     gtk_label_set_markup(GTK_LABEL(label), statement);
-    gtk_label_set_markup(GTK_LABEL(label1), "To connect press WPS button on your router and press OK");
-    gtk_fixed_put (GTK_FIXED (fixed), label, 600, 295);
+    gtk_fixed_put (GTK_FIXED (fixed), label, 690-(a*5), 295);
     gtk_fixed_put (GTK_FIXED (fixed), label1, 438, 345);
     gtk_fixed_put (GTK_FIXED (fixed), button, 645, 385);
-
     g_timeout_add(50, cback, NULL);
     gtk_widget_set_visible(window2, TRUE);
     gtk_widget_show_all(window2);
@@ -202,34 +172,24 @@ void wait_screen(GtkApplication *app, gpointer user_data)
 
 int wait_screen_start()
 {
-  GtkApplication *app;
-  int status;
- 
-  app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (wait_screen), NULL);
-  status = g_application_run (G_APPLICATION (app), 0, 0);
-  g_object_unref (app);
- 
-  return status;
+    GtkApplication *app;
+    int status;
+
+    app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
+    g_signal_connect (app, "activate", G_CALLBACK (wait_screen), NULL);
+    status = g_application_run (G_APPLICATION (app), 0, 0);
+    g_object_unref (app);
+
+    return status;
 }
 
 void draw_st_destroy()
 {
-    switch(window_active)
+    gtk_init(0, 0);
+    if(window_active == 2)
     {
-        gtk_init(0, 0);
-        case 1: if(window1 != NULL)
-        {
-            gtk_widget_destroy(window1);
-        }
-        break;
-
-        case 2: if(window2 != NULL)
-        {
-            gtk_widget_destroy(window2);
-        }
-        break;
-        g_timeout_add(5, cback, NULL);
-        gtk_main();
+        gtk_widget_destroy(window2);
     }
+    g_timeout_add(5, cback, NULL);
+    gtk_main();
 }
