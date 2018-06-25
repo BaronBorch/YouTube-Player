@@ -10,13 +10,19 @@ pthread_t thread;
 void *run_chromium(void *vargp)
 {
     system("chromium-browser --kiosk --disable-infobars youtube.com/tv");
+    return 0;
+}
+
+void run_chrom()
+{
+    pthread_create(&thread, NULL, run_chromium, NULL);
 }
 
 int main(int argc, char *argv[])
 {
     if(argc == 1)
     {
-        pthread_create(&thread, NULL, run_chromium, NULL);
+        register_internet_conection(run_chrom);
     }
 
     app();
