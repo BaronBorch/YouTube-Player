@@ -11,9 +11,23 @@
 #include "gui/gui.h"
 #include "app.h"
 
-static pthread_mutex_t Mutex, Mutex2;
+pthread_mutex_t Mutex, Mutex2;
 pthread_t thread1, thread2;
-int OK_button_chceck = 0, internet_access = 0;
+int OK_button_chceck = 0, internet_access = 0, a = 0;
+event_cb internet_connection;
+
+void register_internet_conection(event_cb a)
+{
+    internet_connection = a;
+}
+
+void call_cb(event_cb a)
+{
+    if(a != NULL)
+    {
+        a();
+    }
+}
 
 void check_wpa_connect();
 
@@ -108,6 +122,35 @@ void set_HDMI()
     pclose(file_d);
 }
 
+void check_wire_connect()
+{
+    switch(system("ping -c1 www.google.com"))
+    {
+        case 0:
+        {
+            OK_button_chceck = 1;
+            printf("%s\n", "internet connection OK");
+            draw_statement("Internet connected", 0);
+            internet_access = 1;
+        }
+        break;
+        case 512:
+        {
+            OK_button_chceck = 1;
+            draw_statement("WiFi not connected", 1);
+            printf("%s\n", "no internet");
+        }
+        break;
+        default:
+        {
+            OK_button_chceck = 0;
+            draw_statement("Something went wrong :(", 0);
+            printf("%s\n", "inactive Wystąpił błąd :(");
+        }
+        break;
+    }
+}
+
 void check_wpa_connect()
 {
     if(internet_access == 0)
@@ -124,7 +167,7 @@ void check_wpa_connect()
         {
             OK_button_chceck = 1;
             printf("%s\n", "WiFi conected");
-            draw_statement("WiFi conected");
+            draw_statement("WiFi conected", 0);
             internet_access = 1;
         }
 
@@ -132,14 +175,14 @@ void check_wpa_connect()
         {
             OK_button_chceck = 1;
             printf("%s\n", "WiFi disconnected");
-            draw_st_disconnect("WiFi not connected");
+            check_wire_connect();
         }
 
         else if(strcmp("ASSOCIATED", wpa_state) == 0)
         {
             OK_button_chceck = 1;
             printf("%s\n", "WiFi conected");
-            draw_statement("WiFi conected");
+            draw_statement("WiFi conected", 0);
             internet_access = 1;
         }
 
@@ -154,37 +197,13 @@ void check_wpa_connect()
         else if(strcmp("INACTIVE", wpa_state) == 0)
         {
          printf("%s\n", "WiFi inactive");
-            switch(system("ping -c1 www.google.com"))
-            {
-                case 0:
-                {
-                    OK_button_chceck = 1;
-                    printf("%s\n", "internet connection OK");
-                    draw_statement("Internet connected");
-                    internet_access = 1;
-                }
-                break;
-                case 512:
-                {
-                    OK_button_chceck = 1;
-                    draw_st_disconnect("WiFi not connected");
-                    printf("%s\n", "no internet");
-                }
-                break;
-                default:
-                {
-                    OK_button_chceck = 0;
-                    draw_statement("Something went wrong :(");
-                    printf("%s\n", "inactive Wystąpił błąd :(");
-                }
-                break;
-            }
+         check_wire_connect();
         }
 
         else
         {
             OK_button_chceck = 0;
-            draw_statement("Something went wrong :(");
+            draw_statement("Something went wrong :(", 0);
             printf("%s\n", "else Wystąpił błąd :(");
         }
     }
@@ -192,7 +211,16 @@ void check_wpa_connect()
 
 void wps_connect()
 {
-    draw_st_destroy();
+    if(a != 1)
+    {
+        draw_st_destroy();
+        if(internet_access == 1)
+        {
+            call_cb(internet_connection);
+            a = 1;
+        }
+    }
+
     if(internet_access == 0)
     {
         system("wpa_cli wps_pbc");
@@ -204,6 +232,7 @@ void wps_connect()
 void app()
 {
     gui_init();
+    system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
     check_wpa_connect();
     input_read_start();
 
