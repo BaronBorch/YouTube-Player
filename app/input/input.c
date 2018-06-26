@@ -16,6 +16,7 @@ event_cb key_volume_up_cb;
 event_cb key_volume_down_cb;
 event_cb key_mute_cb;
 event_cb key_power_cb;
+event_cb key_enter_cb;
 
 void register_volume_up_callback(event_cb a)
 {
@@ -32,6 +33,10 @@ void register_volume_mute_callback(event_cb a)
 void register_power_callback(event_cb a)
 {
     key_power_cb = a;
+}
+void register_enter_callback(event_cb a)
+{
+    key_enter_cb = a;
 }
 
 void call_callback(event_cb a)
@@ -75,6 +80,12 @@ void *input_read(void *vargp)
             case KEY_SLEEP: if(key_state != key_release)
             {
                 call_callback(key_power_cb);
+            }
+            break;
+
+            case KEY_ENTER: if(key_state != key_release)
+            {
+                call_callback(key_enter_cb);
             }
             break;
         }
