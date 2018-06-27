@@ -20,12 +20,13 @@ void run_chrom()
 
 int main(int argc, char *argv[])
 {
+    app();
+
     if(argc == 1)
     {
         register_internet_conection(run_chrom);
     }
 
-    app();
     pthread_join(thread, NULL);
     return 0;
 }
