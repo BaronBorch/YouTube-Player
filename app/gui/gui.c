@@ -4,14 +4,16 @@
 #include <string.h>
 #include "gui.h"
 
-GtkWidget *window, *window1, *window2, *window3, *spin;
+GtkWidget *window, *window2, *window3, *spin;
 gboolean active;
 int rect_height, gui_hided, window_active, a;
 char value[5];
 
 gboolean cback(gpointer u)
 {
+    printf("++ %s\n", __func__);
     gtk_main_quit();
+    printf("-- %s\n", __func__);
     return FALSE;
 }
 
@@ -25,7 +27,6 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_background_img.png");
     cairo_image_surface_get_height (image);
     cairo_set_source_surface (cr, image, 0, 0);
-    //cairo_set_source_rgb (cr, 0.5, 0.5, 1);
     cairo_paint (cr);
     cairo_surface_destroy (image);
 
@@ -42,7 +43,6 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_new_path (cr);
     image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_foreground_img.png");
     cairo_set_source_surface (cr, image, 0, 0);
-    //cairo_set_source_rgb (cr, 0.5, 0.5, 1);
     cairo_paint (cr);
     cairo_surface_destroy (image);
 
@@ -79,6 +79,7 @@ gboolean draw_vol_value (GtkWidget *widget, cairo_t *cr)
 
 void gui_init()
 {
+    printf("++ %s\n", __func__);
     gtk_init(0, 0);
     window = gtk_window_new(GTK_WINDOW_POPUP);
     gtk_window_move(GTK_WINDOW(window), 1280, 548);
@@ -88,45 +89,48 @@ void gui_init()
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_rect2), NULL);
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw_vol_value), NULL);
+    printf("-- %s\n", __func__);
 }
 
 void gui_hide()
 {
+    printf("++ %s\n", __func__);
     if(gui_hided == 0)
     {
         gtk_init(0, 0);
         gtk_widget_hide(window);
-        g_timeout_add(5, cback, NULL);
+        g_timeout_add(50, cback, NULL);
         gtk_main();
         gui_hided = 1;
     }
+    printf("-- %s\n", __func__);
 }
 
 void gui_show_volumebar(int height, char inscription[5])
 {
+    printf("++ %s\n", __func__);
     rect_height = height*2;
     strncpy(value, inscription, 5);
     gui_hided = 0;
 
     gtk_widget_queue_draw(window);
     gtk_widget_set_visible(window, TRUE);
-    g_timeout_add(10, cback, NULL);
+    g_timeout_add(100, cback, NULL);
     gtk_main();
+    printf("-- %s\n", __func__);
 }
 
 void draw_statement(char statement[40], int wps_dc)
 {
     GtkWidget *fixed, *button, *label, *label1;
+    printf("++ %s\n", __func__);
 
-    g_object_get (GTK_SPINNER (spin), "active", &active, NULL);
-    if(active)
+    if(window_active == 3)
     {
-        gtk_spinner_stop (GTK_SPINNER (spin));
-        if(window_active == 3)
-        {
-            gtk_widget_destroy(window3);
-        }
+        gtk_widget_destroy(window3);
     }
+
+    printf("   %s spin stop\n", __func__);
 
     window_active = 2;
     gtk_init(0, 0);
@@ -137,25 +141,32 @@ void draw_statement(char statement[40], int wps_dc)
     button = gtk_button_new_with_label("OK");
     a = strlen(statement);
 
+    printf("   %s window init\n", __func__);
+
     if(wps_dc == 1)
     {
-    gtk_label_set_markup(GTK_LABEL(label1), "To connect press WPS button on your router and press OK");
+    gtk_label_set_markup(GTK_LABEL(label1), "To connect with WiFi press WPS button on your router and press OK");
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window2), 1380, 768);
     gtk_container_add(GTK_CONTAINER(window2), fixed);
     gtk_label_set_markup(GTK_LABEL(label), statement);
     gtk_fixed_put (GTK_FIXED (fixed), label, 690-(a*5), 295);
-    gtk_fixed_put (GTK_FIXED (fixed), label1, 438, 345);
+    gtk_fixed_put (GTK_FIXED (fixed), label1, 405, 345);
     gtk_fixed_put (GTK_FIXED (fixed), button, 645, 385);
-    g_timeout_add(50, cback, NULL);
+    printf("   %s window setup\n", __func__);
     gtk_widget_set_visible(window2, TRUE);
     gtk_widget_show_all(window2);
+    g_timeout_add(100, cback, NULL);
+    printf("   %s window show\n", __func__);
     gtk_main();
+    printf("   %s gtk main\n", __func__);
+    printf("-- %s\n", __func__);
 }
 
 void wait_screen(GtkApplication *app, gpointer user_data)
 {
+    printf("++ %s\n", __func__);
     if(window_active == 2)
     {
         gtk_widget_destroy(window2);
@@ -172,28 +183,40 @@ void wait_screen(GtkApplication *app, gpointer user_data)
     gtk_spinner_start (GTK_SPINNER (spin));
 
     gtk_widget_show_all(window3);
+    printf("-- %s\n", __func__);
 }
 
 int wait_screen_start()
 {
-    GtkApplication *app;
     int status;
+    if(window_active != 3)
+    {
+        printf("++ %s\n", __func__);
+        GtkApplication *app;
 
-    app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect (app, "activate", G_CALLBACK (wait_screen), NULL);
-    status = g_application_run (G_APPLICATION (app), 0, 0);
-    g_object_unref (app);
+        app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
+        g_signal_connect (app, "activate", G_CALLBACK (wait_screen), NULL);
+        status = g_application_run (G_APPLICATION (app), 0, 0);
+        g_object_unref (app);
 
+        printf("-- %s\n", __func__);
+    }
     return status;
 }
 
 void draw_st_destroy()
 {
+    printf("++ %s\n", __func__);
     gtk_init(0, 0);
     if(window_active == 2)
     {
         gtk_widget_destroy(window2);
     }
+    if(window_active == 3)
+    {
+        gtk_widget_destroy(window3);
+    }
     g_timeout_add(5, cback, NULL);
     gtk_main();
+    printf("-- %s\n", __func__);
 }
