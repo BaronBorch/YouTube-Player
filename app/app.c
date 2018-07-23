@@ -167,7 +167,6 @@ void check_internet_connect()
                     OK_button_chceck = 0;
                     printf("%s\n", "scanning");
                     pthread_create(&thread2, NULL, wps_thread, NULL);
-                    wait_screen_start();
                 }
 
                 else
@@ -180,7 +179,7 @@ void check_internet_connect()
             default:
             {
                 OK_button_chceck = 0;
-                draw_statement("Something went wrong :(", 0);
+                draw_statement("Something went wrong :(", 2);
                 printf("%s\n", "inactive Wystąpił błąd :(");
             }
             break;
@@ -190,16 +189,6 @@ void check_internet_connect()
 
 void wps_connect()
 {
-    if(a != 1)
-    {
-        draw_st_destroy();
-        if(internet_access == 1)
-        {
-            call_cb(internet_connection);
-            a = 1;
-        }
-    }
-
     if(internet_access == 0)
     {
         system("wpa_cli wps_pbc");
@@ -208,19 +197,25 @@ void wps_connect()
     }
 }
 
+void run_yt()
+{
+    call_cb(internet_connection);
+}
+
 void app()
 {
+    printf("++ %s\n", __func__);
+    register_button_OK_connected_callback(run_yt);
+    register_button_OK_connect_with_wps_callback(wps_connect);
+    register_volume_up_callback(handle_volume_change);
+    register_volume_down_callback(handle_volume_change);
+    register_volume_mute_callback(handle_volume_change);
+    register_power_callback(set_HDMI);
+
     gui_init();
     input_read_start();
     system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
     check_internet_connect();
 
-    if(OK_button_chceck == 1)
-    {
-    register_enter_callback(wps_connect);
-    }
-    register_volume_up_callback(handle_volume_change);
-    register_volume_down_callback(handle_volume_change);
-    register_volume_mute_callback(handle_volume_change);
-    register_power_callback(set_HDMI);
+    printf("-- %s\n", __func__);
 }
