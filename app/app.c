@@ -191,6 +191,7 @@ void wps_connect()
 {
     if(internet_access == 0)
     {
+        system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
         system("wpa_cli wps_pbc");
         printf("%s\n", "wps connect here, trying to connect");
         check_internet_connect();
@@ -202,11 +203,21 @@ void run_yt()
     call_cb(internet_connection);
 }
 
+void connect_with_pass()
+{
+    system("sudo killall wpa_supplicant");
+    sleep(2);
+    system("sudo wpa_supplicant -Dwext -iwlan0 -c/home/pi/wpa.conf -B");
+    sleep(10);
+    check_internet_connect();
+}
+
 void app()
 {
     printf("++ %s\n", __func__);
     register_button_OK_connected_callback(run_yt);
     register_button_OK_connect_with_wps_callback(wps_connect);
+    register_connect_with_password(connect_with_pass);
     register_volume_up_callback(handle_volume_change);
     register_volume_down_callback(handle_volume_change);
     register_volume_mute_callback(handle_volume_change);
@@ -214,7 +225,6 @@ void app()
 
     gui_init();
     input_read_start();
-    system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
     check_internet_connect();
 
     printf("-- %s\n", __func__);
