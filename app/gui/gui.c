@@ -2,13 +2,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "gui.h"
 #include "gui_treelist.h"
+#include "gui_keyboard.h"
 
 GtkWidget *window, *window2, *window3, *spin;
 gboolean active;
 event_cb button_OK_connected_cb; 
 event_cb connect_with_wps;
+event_cb password_connect;
 int rect_height, gui_hided, window_active, a;
 char value[5];
 
@@ -22,15 +25,22 @@ void register_button_OK_connect_with_wps_callback(event_cb a)
     connect_with_wps = a;
 }
 
+void register_connect_with_password(event_cb a)
+{
+    password_connect = a;
+}
+
 void call_callbacks(event_cb a)
 {
-    printf("++ %s\n", __func__);
     if(a != NULL)
     {
-        printf(" inside callbac gui\n");
         a();
     }
-    printf("-- %s\n", __func__);
+}
+
+void connect_with_password()
+{
+    call_callbacks(password_connect);
 }
 
 gboolean cback(gpointer u)
@@ -171,36 +181,35 @@ gboolean button1_clicked(GtkWidget *widget, gpointer a)
     return FALSE;
 }
 
-gboolean button2_clicked()
+gboolean button2_clicked(GtkWidget *widget, gpointer a)
 {
+    printf("++ %s\n", __func__);
     gtk_widget_destroy(window2);
     gtk_main_quit();
     treelist();
+    call_callbacks(password_connect);
+    wait_screen_start();
+    printf("wpa.conf done\n");
+    printf("-- %s\n", __func__);
     return FALSE;
 }
 
 void draw_statement(char statement[40], int wps_dc)
 {
-    GtkWidget *fixed, *button1, *button2, *label, *label1, *label2;
-    printf("++ %s\n", __func__);
-
     if(window_active == 3)
     {
-        gtk_spinner_stop (GTK_SPINNER (spin));
         gtk_widget_destroy(window3);
-        gtk_main_quit();
         printf("   %s spin stop\n", __func__);
     }
 
+    GtkWidget *fixed, *button1, *label;
+    printf("++ %s\n", __func__);
+
     window_active = 2;
-    gtk_init(0, 0);
     window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     fixed = gtk_fixed_new();
     label = gtk_label_new(NULL);
-    label1 = gtk_label_new(NULL);
-    label2 = gtk_label_new(NULL);
     button1 = gtk_button_new_with_label("OK");
-    button2 = gtk_button_new_with_label("Enter password");
     a = strlen(statement);
 
     gtk_window_fullscreen (GTK_WINDOW (window2));
@@ -214,6 +223,9 @@ void draw_statement(char statement[40], int wps_dc)
 
     if(wps_dc == 1)
     {
+        GtkWidget *label1, *button2;
+        label1 = gtk_label_new(NULL);
+        button2 = gtk_button_new_with_label("Enter password");
         gtk_label_set_markup(GTK_LABEL(label1), "Select the connection method");
         gtk_fixed_put(GTK_FIXED (fixed), label1, 550, 345);
         gtk_button_set_label(GTK_BUTTON(button1), "WPS");
@@ -221,10 +233,13 @@ void draw_statement(char statement[40], int wps_dc)
         gtk_widget_set_size_request(button2, 200, 50);
         gtk_fixed_put (GTK_FIXED (fixed), button1, 327, 385);
         gtk_fixed_put (GTK_FIXED (fixed), button2, 854, 385);
+        g_signal_connect(button2, "clicked", G_CALLBACK(button2_clicked), NULL);
     }
 
     if(wps_dc == 2)
     {
+        GtkWidget *label2;
+        label2 = gtk_label_new(NULL);
         gtk_label_set_markup(GTK_LABEL(label2), "To connect with WiFi press WPS button on your router and press OK");
         gtk_fixed_put (GTK_FIXED (fixed), label2, 405, 345);
     }
@@ -234,14 +249,13 @@ void draw_statement(char statement[40], int wps_dc)
 
     g_signal_connect(button1, "clicked", G_CALLBACK(button1_clicked), (gpointer)GINT_TO_POINTER(wps_dc));
     printf("g signal 1 \n");
-    g_signal_connect(button2, "clicked", G_CALLBACK(button2_clicked), NULL);
-    printf("g signal 2 \n");
 
-    gtk_widget_queue_draw(window2);
+    //sleep(1);
     gtk_widget_set_visible(window2, TRUE);
     printf("set visible \n");
     gtk_widget_show_all(window2);
     printf("   %s window show\n", __func__);
+
     gtk_main();
     printf("   %s gtk main\n", __func__);
     printf("-- %s\n", __func__);
@@ -250,10 +264,6 @@ void draw_statement(char statement[40], int wps_dc)
 void wait_screen(GtkApplication *app, gpointer user_data)
 {
     printf("++ %s\n", __func__);
-    if(window_active == 2)
-    {
-        gtk_widget_destroy(window2);
-    }
     window_active = 3;
     window3 = gtk_application_window_new (app);
     spin = gtk_spinner_new();

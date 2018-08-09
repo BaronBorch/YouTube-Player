@@ -5,117 +5,131 @@
 #include <ctype.h>
 #include "gui_keyboard.h"
 
-void chage_button_bg();
-
+event_cb password;
 GtkWidget *window, *fixed, *label;
 int shift_counter = 0, caps_check = 0, alt_check = 0;
-char text[100] = "";
+char text[30] = "", ssid[20];
 const gchar *text_label;
+
+void chage_button_bg();
+
+void register_password_ready(event_cb a)
+{
+    password = a;
+}
+
+void call(event_cb a)
+{
+    if(a != NULL)
+    {
+	a();
+    }
+}
 
 void button_clicked(gpointer a)
 {
     text_label = gtk_button_get_label(a);
 
     if(strcmp("<-", text_label) == 0)
-        text[strlen(text)-1] = 0;
+	text[strlen(text)-1] = 0;
 
     else if(strcmp("Space", text_label) == 0)
-        strcat(text, " ");
+	strcat(text, " ");
 
     else if(strcmp("Tab", text_label) == 0)
-        strcat(text, "    ");
+	strcat(text, "    ");
 
     else if(strcmp("Alt", text_label) == 0)
-            alt_check = 1;
+	    alt_check = 1;
 
     else if(strcmp("Shift", text_label) == 0)
     {
-        if(shift_counter != 2)
-            shift_counter = 1;
+	if(shift_counter != 2)
+	    shift_counter = 1;
     }
 
     else if(strcmp("Caps", text_label) == 0)
     {
-        if(shift_counter != 2)
-            shift_counter = 2;
-        else 
-            shift_counter = 0;
+	if(shift_counter != 2)
+	    shift_counter = 2;
+	else 
+	    shift_counter = 0;
     }
 
     else if(shift_counter == 1 || shift_counter == 2)
     {
-        if(alt_check == 1)
-        {
-            if(strcmp("A", text_label) == 0)
-                strcat(text, "Ą");
-            else if(strcmp("C", text_label) == 0)
-                strcat(text, "Ć");
-            else if(strcmp("E", text_label) == 0)
-                strcat(text, "Ę");
-            else if(strcmp("L", text_label) == 0)
-                strcat(text, "Ł");
-            else if(strcmp("N", text_label) == 0)
-                strcat(text, "Ń");
-            else if(strcmp("O", text_label) == 0)
-                strcat(text, "Ó");
-            else if(strcmp("S", text_label) == 0)
-                strcat(text, "Ś");
-            else if(strcmp("X", text_label) == 0)
-                strcat(text, "Ź");
-            else if(strcmp("Z", text_label) == 0)
-                strcat(text, "Ż");
-            else
-                strcat(text, text_label);
-            alt_check = 0;
-        }
-        else if(alt_check == 0)
-            strcat(text, text_label);
+	if(alt_check == 1)
+	{
+	    if(strcmp("A", text_label) == 0)
+		strcat(text, "Ą");
+	    else if(strcmp("C", text_label) == 0)
+		strcat(text, "Ć");
+	    else if(strcmp("E", text_label) == 0)
+		strcat(text, "Ę");
+	    else if(strcmp("L", text_label) == 0)
+		strcat(text, "Ł");
+	    else if(strcmp("N", text_label) == 0)
+		strcat(text, "Ń");
+	    else if(strcmp("O", text_label) == 0)
+		strcat(text, "Ó");
+	    else if(strcmp("S", text_label) == 0)
+		strcat(text, "Ś");
+	    else if(strcmp("X", text_label) == 0)
+		strcat(text, "Ź");
+	    else if(strcmp("Z", text_label) == 0)
+		strcat(text, "Ż");
+	    else
+		strcat(text, text_label);
+	    alt_check = 0;
+	}
+	else if(alt_check == 0)
+	    strcat(text, text_label);
 
-        chage_button_bg();
-        if(shift_counter == 1)
-            shift_counter = 0;
+	chage_button_bg();
+	if(shift_counter == 1)
+	    shift_counter = 0;
     }
 
     else
     {
-        if(alt_check == 1)
-        {
-            if(strcmp("A", text_label) == 0)
-                strcat(text, "ą");
-            else if(strcmp("C", text_label) == 0)
-                strcat(text, "ć");
-            else if(strcmp("E", text_label) == 0)
-                strcat(text, "ę");
-            else if(strcmp("L", text_label) == 0)
-                strcat(text, "ł");
-            else if(strcmp("N", text_label) == 0)
-                strcat(text, "ń");
-            else if(strcmp("O", text_label) == 0)
-                strcat(text, "ó");
-            else if(strcmp("S", text_label) == 0)
-                strcat(text, "ś");
-            else if(strcmp("X", text_label) == 0)
-                strcat(text, "ź");
-            else if(strcmp("Z", text_label) == 0)
-                strcat(text, "ż");
-            else
-            {
-                char buffor[2];
-                strcat(buffor, text_label);
-                buffor[1] = tolower(buffor[1]);
-                strcat(text, &buffor[1]);
-            }
-            alt_check = 0;
-            chage_button_bg();
-        }
+	if(alt_check == 1)
+	{
+	    if(strcmp("A", text_label) == 0)
+		strcat(text, "ą");
+	    else if(strcmp("C", text_label) == 0)
+		strcat(text, "ć");
+	    else if(strcmp("E", text_label) == 0)
+		strcat(text, "ę");
+	    else if(strcmp("L", text_label) == 0)
+		strcat(text, "ł");
+	    else if(strcmp("N", text_label) == 0)
+		strcat(text, "ń");
+	    else if(strcmp("O", text_label) == 0)
+		strcat(text, "ó");
+	    else if(strcmp("S", text_label) == 0)
+		strcat(text, "ś");
+	    else if(strcmp("X", text_label) == 0)
+		strcat(text, "ź");
+	    else if(strcmp("Z", text_label) == 0)
+		strcat(text, "ż");
+	    else
+	    {
+		char buffor[2];
+		strcat(buffor, text_label);
+		buffor[1] = tolower(buffor[1]);
+		strcat(text, &buffor[1]);
+	    }
+	    alt_check = 0;
+	    chage_button_bg();
+	}
 
-        else
-        {
-            char buffor[2];
-            strcat(buffor, text_label);
-            buffor[1] = tolower(buffor[1]);
-            strcat(text, &buffor[1]);
-        }
+	else
+	{
+	    char buffor[2];
+	    strcat(buffor, text_label);
+	    buffor[1] = tolower(buffor[1]);
+	    strcat(text, &buffor[1]);
+	}
     }
 
     g_print("%s\n", text);
@@ -128,22 +142,22 @@ void double_button_clicked(gpointer a)
 
     if(shift_counter == 1)
     {
-        char buffor[5];
-        strcpy(buffor, text_label);
-        strcpy(&buffor[1], "");
+	char buffor[5];
+	strcpy(buffor, text_label);
+	strcpy(&buffor[1], "");
 
-        if(strcmp("&\n7", text_label) == 0)
-            strcat(text, "&amp;");
+	if(strcmp("&\n7", text_label) == 0)
+	    strcat(text, "&amp;");
 
-        else
-            strcat(text, buffor);
+	else
+	    strcat(text, buffor);
 
-        chage_button_bg();
-        shift_counter = 0;
+	chage_button_bg();
+	shift_counter = 0;
     }
 
     else
-        strcat(text, &text_label[2]);
+	strcat(text, &text_label[2]);
 
     g_print("%s\n", text);
     gtk_label_set_markup(GTK_LABEL(label), text);
@@ -155,77 +169,93 @@ void chage_button_bg()
 
     if((strcmp("Shift", text_label) == 0) && (shift_counter != 2))
     {
-        GtkCssProvider *cssProvider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
-        "window #button_shift_left {background: cyan;}" "window #button_shift_right {background: cyan;}", 
-        -1, NULL);
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                               GTK_STYLE_PROVIDER(cssProvider),
-                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+	"window #button_shift_left {background: cyan;}" "window #button_shift_right {background: cyan;}", 
+	-1, NULL);
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+			       GTK_STYLE_PROVIDER(cssProvider),
+			       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
     else if((shift_counter == 1 || shift_counter == 2) && alt_check == 0)
     {
-        GtkCssProvider *cssProvider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
-        "window #button_shift_left {background: gainsboro;}" "window #button_shift_right {background: gainsboro;}", 
-        -1, NULL);
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                               GTK_STYLE_PROVIDER(cssProvider),
-                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+	"window #button_shift_left {background: gainsboro;}" "window #button_shift_right {background: gainsboro;}", 
+	-1, NULL);
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+			       GTK_STYLE_PROVIDER(cssProvider),
+			       GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
     if(strcmp("Caps", text_label) == 0)
     {
-        if(caps_check == 0)
-        {
-            strcpy(color, "window #button_caps {background: cyan;}");
-            caps_check = 1;
-        }
-        else
-        {
-            strcpy(color, "window #button_caps {background: gainsboro;}");
-            caps_check = 0;
-        }
-        GtkCssProvider *cssProvider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
-        color, -1, NULL);
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                            GTK_STYLE_PROVIDER(cssProvider),
-                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	if(caps_check == 0)
+	{
+	    strcpy(color, "window #button_caps {background: cyan;}");
+	    caps_check = 1;
+	}
+	else
+	{
+	    strcpy(color, "window #button_caps {background: gainsboro;}");
+	    caps_check = 0;
+	}
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+	color, -1, NULL);
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+			    GTK_STYLE_PROVIDER(cssProvider),
+			    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
     if((strcmp("Alt", text_label) == 0) || alt_check == 0)
     {
-        if(alt_check == 0)
-            strcpy(color, "window #button_alt_right {background: gainsboro;}");
-        else
-            strcpy(color, "window #button_alt_right {background: cyan;}");
+	if(alt_check == 0)
+	    strcpy(color, "window #button_alt_right {background: gainsboro;}");
+	else
+	    strcpy(color, "window #button_alt_right {background: cyan;}");
 
-        GtkCssProvider *cssProvider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
-        color, -1, NULL);
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                            GTK_STYLE_PROVIDER(cssProvider),
-                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	GtkCssProvider *cssProvider = gtk_css_provider_new();
+	gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+	color, -1, NULL);
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+			    GTK_STYLE_PROVIDER(cssProvider),
+			    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 }
 
 void enter_clicked()
 {
+    int error;
+    FILE *wpa = fopen("/home/pi/wpa.conf", "w");
+    if (wpa == NULL)
+	printf("Error opening file!\n");
+
+    char wpaconf[200] =     "network={\n	ssid=\"";
+    strcat(wpaconf, ssid);
+    strcat(wpaconf, "\"\n	psk=\"");
+    strcat(wpaconf, text);
+    strcat(wpaconf, "\"\n}");
+    error = fprintf(wpa, wpaconf);
+    printf("Error z gtk keyboard  = %i\n", error);
+    fclose(wpa);
+
     g_print("Enter clicked, password is: %s\n", text);
     gtk_widget_destroy(window);
+    gtk_main_quit();
+    call(password);
 }
 
-int gui_keyboard()
+int gui_keyboard(char login[20])
 {
-    gtk_init(0, 0);
+    strcpy(ssid, login);
 
     GtkWidget *b_tylda, *b_1, *b_2, *b_3, *b_4, *b_5, *b_6, *b_7, *b_8, *b_9, *b_0, *b_dash, *b_equal, *b_bspc,
-            *b_tab, *b_q, *b_w, *b_e, *b_r, *b_t, *b_y, *b_u, *b_i, *b_o, *b_p, *b_lbracket, *b_rbracket, *b_rslash,
-            *b_caps, *b_a, *b_s, *b_d, *b_f, *b_g, *b_h, *b_j, *b_k, *b_l, *b_semicolon, *b_quote, *b_enter,
-            *b_lshift, *b_z, *b_x, *b_c, *b_v, *b_b, *b_n, *b_m, *b_comma, *b_dot, *b_lslash, *b_rshift,
-            *b_lctrl, *b_lalt, *b_space, *b_ralt, *b_rctrl;
+	    *b_tab, *b_q, *b_w, *b_e, *b_r, *b_t, *b_y, *b_u, *b_i, *b_o, *b_p, *b_lbracket, *b_rbracket, *b_rslash,
+	    *b_caps, *b_a, *b_s, *b_d, *b_f, *b_g, *b_h, *b_j, *b_k, *b_l, *b_semicolon, *b_quote, *b_enter,
+	    *b_lshift, *b_z, *b_x, *b_c, *b_v, *b_b, *b_n, *b_m, *b_comma, *b_dot, *b_lslash, *b_rshift,
+	    *b_lctrl, *b_lalt, *b_space, *b_ralt, *b_rctrl;
 
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);

@@ -24,7 +24,10 @@ gboolean button_click(GtkWidget *widget, GdkEvent *event, gpointer a)
         g_print ("%s\n", value);
         gtk_widget_hide(a);
         gtk_label_set_markup(GTK_LABEL(label), "Enter password: ");
-        gui_keyboard();
+
+        gui_keyboard(value);
+        gtk_widget_destroy(GTK_WIDGET(widget));
+        gtk_main_quit();
     }
     return FALSE;
     printf("-- %s\n", __func__);
@@ -79,7 +82,6 @@ int treelist()
 {
     printf("++ %s\n", __func__);
 
-    gtk_init(0, 0);
     GtkWidget *window, *list, *fixed, *label;
     GtkTreeSelection *selection;
     GtkCssProvider *cssProvider;
