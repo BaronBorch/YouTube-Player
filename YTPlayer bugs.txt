@@ -1,0 +1,165 @@
+Log z YTPlayer, polaczenie z haslem
+
+
+++ app
+++ gui_init
+
+** (YTPlayer:985): WARNING **: Error retrieving accessibility bus address: org.freedesktop$
+-- gui_init
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+DISCONNECTED
+WiFi disconnected
+++ draw_statement
+
+(YTPlayer:985): Gtk-WARNING **: Can't set a parent on widget which has a parent
+   draw_statement window setup
+g signal 1
+set visible
+   draw_statement window show
+++ button2_clicked
+
+(YTPlayer:985): Gtk-CRITICAL **: gtk_widget_destroy: assertion 'GTK_IS_WIDGET (widget)' fa$
+
+(YTPlayer:985): Gtk-CRITICAL **: gtk_widget_destroy: assertion 'GTK_IS_WIDGET (widget)' fa$
+++ treelist
+++ init_list
+-- init_list
+++ add_to_list
+-- add_to_list
+++ add_to_list
+-- add_to_list
+++ add_to_list
+-- add_to_list
+++ on_changed
+activated: NETIA-facb97
+-- on_changed
+++ button_click
+++ on_changed
+activated: FunBox-F32B
+-- on_changed
+++ button_click
+FunBox-F32B
+   gui_keyboard window show
+f
+fu
+fun
+funb
+funbo
+funbox
+funbox0
+funbox08
+Error z gtk keyboard  = 47
+Enter clicked, password is: funbox08
+-- treelist
+++ wait_screen_start
+++ wait_screen
+-- wait_screen
+Successfully initialized wpa_supplicant
+Successfully initialized wpa_supplicant
+ioctl[SIOCSIWENCODEEXT]: Invalid argument
+ioctl[SIOCSIWENCODEEXT]: Invalid argument
+PING www.google.com (172.217.17.100) 56(84) bytes of data.
+64 bytes from ams15s29-in-f100.1e100.net (172.217.17.100): icmp_seq=1 ttl=52 time=61.1 ms
+
+--- www.google.com ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 61.103/61.103/61.103/0.000 ms
+internet connection OK
+   draw_statement spin stop
+++ draw_statement
+-- wait_screen_start
+wpa.conf done
+-- button2_clicked
+   draw_statement window setup
+g signal 1
+                <-----tu powinno byc set visible jeszcze
+   draw_statement gtk main
+-- draw_statement
+Fatal error: glibc detected an invalid stdio handle
+Przerwane
+
+Wystepuje jeszcze:
+naruszenie ochrony pamieci
+multi-thread (to co nizej)
+
+
+
+Log z YTPlayer, lacznie przez WPS
+
+
+++ app
+++ gui_init
+
+** (YTPlayer:971): WARNING **: Error retrieving accessibility bus address: org.freedesktop$
+-- gui_init
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+DISCONNECTED
+WiFi disconnected
+++ draw_statement
+
+(YTPlayer:971): Gtk-WARNING **: Can't set a parent on widget which has a parent
+   draw_statement window setup
+g signal 1
+set visible
+   draw_statement window show
+++ button1_clicked
+int i = 1
+++ draw_statement
+   draw_statement window setup
+g signal 1
+set visible
+   draw_statement window show
+++ button1_clicked
+int i = 2
+rm: nie mo퓆a usun방 '/var/run/wpa_supplicant/p2p-dev-wlan0': Nie ma takiego pliku ani kat$
+Selected interface 'wlan0'
+OK
+wps connect here, trying to connect
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+SCANNING
+scanning
+thread start here
+button 1 clicked if 2 waitscreen start
+++ wait_screen_start
+++ wait_screen
+-- wait_screen
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+SCANNING
+scanning
+thread start here
+checking wps scan
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+SCANNING
+scanning
+thread start here
+checking wps scan
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+SCANNING
+scanning
+thread start here
+checking wps scan
+ping: www.google.com: Odwzorowanie nazwy jest chwilowo niemo퓄iwe
+no internet
+ASSOCIATED
+WiFi conected
+   draw_statement spin stop
+++ draw_statement
+   draw_statement window setup
+g signal 1
+                <-----tu powinno byc set visible jeszcze
+-- wait_screen_start
+-- button1_clicked
+   draw_statement gtk main
+-- draw_statement
+-- button1_clicked
+[xcb] Unknown request in queue while dequeuing
+[xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
+[xcb] Aborting, sorry about that.
+YTPlayer: ../../src/xcb_io.c:165: dequeue_pending_request: Warunek zapewnienia `!xcb_xlib_$
+Przerwane
