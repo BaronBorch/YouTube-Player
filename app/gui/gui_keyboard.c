@@ -5,26 +5,12 @@
 #include <ctype.h>
 #include "gui_keyboard.h"
 
-event_cb password;
 GtkWidget *window, *fixed, *label;
 int shift_counter = 0, caps_check = 0, alt_check = 0;
 char text[30] = "", ssid[20];
 const gchar *text_label;
 
 void chage_button_bg();
-
-void register_password_ready(event_cb a)
-{
-    password = a;
-}
-
-void call(event_cb a)
-{
-    if(a != NULL)
-    {
-	a();
-    }
-}
 
 void button_clicked(gpointer a)
 {
