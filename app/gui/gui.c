@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "gui.h"
 #include "gui_treelist.h"
 #include "gui_keyboard.h"
@@ -12,6 +13,7 @@ gboolean active;
 event_cb button_OK_connected_cb; 
 event_cb connect_with_wps;
 event_cb password_connect;
+pthread_t thread1;
 int rect_height, gui_hided, window_active, a;
 char value[5];
 
@@ -153,6 +155,12 @@ void gui_show_volumebar(int height, char inscription[5])
     printf("-- %s\n", __func__);
 }
 
+void *another_password_connect_func(void *vargp)
+{
+    call_callbacks(password_connect);
+    return 0;
+}
+
 gboolean button1_clicked(GtkWidget *widget, gpointer a)
 {
     printf("++ %s\n", __func__);
@@ -175,6 +183,7 @@ gboolean button1_clicked(GtkWidget *widget, gpointer a)
         call_callbacks(connect_with_wps);
         gtk_widget_destroy(window2);
         gtk_main_quit();
+        printf("button 1 clicked if 2 waitscreen start\n");
         wait_screen_start();
     }
     printf("-- %s\n", __func__);
@@ -187,7 +196,7 @@ gboolean button2_clicked(GtkWidget *widget, gpointer a)
     gtk_widget_destroy(window2);
     gtk_main_quit();
     treelist();
-    call_callbacks(password_connect);
+    pthread_create(&thread1, NULL, another_password_connect_func, NULL);
     wait_screen_start();
     printf("wpa.conf done\n");
     printf("-- %s\n", __func__);
@@ -250,7 +259,6 @@ void draw_statement(char statement[40], int wps_dc)
     g_signal_connect(button1, "clicked", G_CALLBACK(button1_clicked), (gpointer)GINT_TO_POINTER(wps_dc));
     printf("g signal 1 \n");
 
-    //sleep(1);
     gtk_widget_set_visible(window2, TRUE);
     printf("set visible \n");
     gtk_widget_show_all(window2);

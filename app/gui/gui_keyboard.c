@@ -225,6 +225,36 @@ void chage_button_bg()
     }
 }
 
+void on_focus_change_color(GtkWidget *widget)
+{
+    char focused_button_color[100];
+
+    strcpy(focused_button_color, "window #");
+    strcat(focused_button_color, gtk_widget_get_name(widget));
+
+    if(gtk_widget_is_focus(widget) == TRUE)
+        strcat(focused_button_color, " {background: cyan;}");
+    else
+    {
+        strcat(focused_button_color, " {background: gainsboro;}");
+    }
+
+    if(((strcmp("button_caps", gtk_widget_get_name(widget)) == 0) && caps_check != 0) ||
+            ((strcmp("button_shift_left", gtk_widget_get_name(widget)) == 0) && shift_counter != 0) ||
+            ((strcmp("button_shift_left", gtk_widget_get_name(widget)) == 0) && shift_counter != 0) ||
+            ((strcmp("button_alt_right", gtk_widget_get_name(widget)) == 0) && alt_check != 0))
+            printf("dont change color now\n");
+    else
+    {
+        GtkCssProvider *cssProvider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+        focused_button_color, -1, NULL);
+        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+                GTK_STYLE_PROVIDER(cssProvider),
+                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+}
+
 void enter_clicked()
 {
     int error;
@@ -336,10 +366,68 @@ int gui_keyboard(char login[20])
     gtk_fixed_put (GTK_FIXED (fixed), label, 350, 20);
 
 
-    gtk_widget_set_name (b_lshift, "button_shift_left");
-    gtk_widget_set_name (b_rshift, "button_shift_right");
-    gtk_widget_set_name (b_ralt, "button_alt_right");
+    gtk_widget_set_name (b_tylda, "button_tylda");
+    gtk_widget_set_name (b_1, "button_1");
+    gtk_widget_set_name (b_2, "button_2");
+    gtk_widget_set_name (b_3, "button_3");
+    gtk_widget_set_name (b_4, "button_4");
+    gtk_widget_set_name (b_5, "button_5");
+    gtk_widget_set_name (b_6, "button_6");
+    gtk_widget_set_name (b_7, "button_7");
+    gtk_widget_set_name (b_8, "button_8");
+    gtk_widget_set_name (b_9, "button_9");
+    gtk_widget_set_name (b_0, "button_0");
+    gtk_widget_set_name (b_dash, "button_dash");
+    gtk_widget_set_name (b_equal, "button_equal");
+    gtk_widget_set_name (b_bspc, "button_backspace");
+
+    gtk_widget_set_name (b_tab, "button_tab");
+    gtk_widget_set_name (b_q, "button_q");
+    gtk_widget_set_name (b_w, "button_w");
+    gtk_widget_set_name (b_e, "button_e");
+    gtk_widget_set_name (b_r, "button_r");
+    gtk_widget_set_name (b_t, "button_t");
+    gtk_widget_set_name (b_y, "button_y");
+    gtk_widget_set_name (b_u, "button_u");
+    gtk_widget_set_name (b_i, "button_i");
+    gtk_widget_set_name (b_o, "button_o");
+    gtk_widget_set_name (b_p, "button_p");
+    gtk_widget_set_name (b_lbracket, "button_left_bracket");
+    gtk_widget_set_name (b_rbracket, "button_right_bracket");
+    gtk_widget_set_name (b_rslash, "button_right_slash");
+
     gtk_widget_set_name (b_caps, "button_caps");
+    gtk_widget_set_name (b_a, "button_a");
+    gtk_widget_set_name (b_s, "button_s");
+    gtk_widget_set_name (b_d, "button_d");
+    gtk_widget_set_name (b_f, "button_f");
+    gtk_widget_set_name (b_g, "button_g");
+    gtk_widget_set_name (b_h, "button_h");
+    gtk_widget_set_name (b_j, "button_j");
+    gtk_widget_set_name (b_k, "button_k");
+    gtk_widget_set_name (b_l, "button_l");
+    gtk_widget_set_name (b_semicolon, "button_semicolon");
+    gtk_widget_set_name (b_quote, "button_quote");
+    gtk_widget_set_name (b_enter, "button_enter");
+
+    gtk_widget_set_name (b_lshift, "button_shift_left");
+    gtk_widget_set_name (b_z, "button_z");
+    gtk_widget_set_name (b_x, "button_x");
+    gtk_widget_set_name (b_c, "button_c");
+    gtk_widget_set_name (b_v, "button_v");
+    gtk_widget_set_name (b_b, "button_b");
+    gtk_widget_set_name (b_n, "button_n");
+    gtk_widget_set_name (b_m, "button_m");
+    gtk_widget_set_name (b_comma, "button_comma");
+    gtk_widget_set_name (b_dot, "button_dot");
+    gtk_widget_set_name (b_lslash, "button_left_slash");
+    gtk_widget_set_name (b_rshift, "button_shift_right");
+
+    gtk_widget_set_name (b_lctrl, "button_left_control");
+    gtk_widget_set_name (b_lalt, "button_alt_left");
+    gtk_widget_set_name (b_space, "button_space");
+    gtk_widget_set_name (b_ralt, "button_alt_right");
+    gtk_widget_set_name (b_rctrl, "button_right_control");
 
 //--------------------------------------------------------------------
 
@@ -537,6 +625,70 @@ int gui_keyboard(char login[20])
     g_signal_connect(b_rshift, "clicked", G_CALLBACK(chage_button_bg), NULL);
     g_signal_connect(b_caps, "clicked", G_CALLBACK(chage_button_bg), NULL);
     g_signal_connect(b_ralt, "clicked", G_CALLBACK(chage_button_bg), NULL);
+
+
+    g_signal_connect(b_tylda, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_1, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_2, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_3, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_4, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_5, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_6, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_7, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_8, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_9, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_0, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_dash, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_equal, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_bspc, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+
+    g_signal_connect(b_tab, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_q, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_w, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_e, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_r, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_t, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_y, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_u, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_i, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_o, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_p, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_lbracket, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_rbracket, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_rslash, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+
+    g_signal_connect(b_caps, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_a, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_s, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_d, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_f, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_g, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_h, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_j, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_k, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_l, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_semicolon, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_quote, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_enter, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+
+    g_signal_connect(b_lshift, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_z, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_x, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_c, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_v, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_b, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_n, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_m, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_comma, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_dot, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_lslash, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_rshift, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+
+    g_signal_connect(b_lctrl, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_lalt, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_space, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_ralt, "event-after", G_CALLBACK(on_focus_change_color), NULL);
+    g_signal_connect(b_rctrl, "event-after", G_CALLBACK(on_focus_change_color), NULL);
 
 //---------------------------------------------------------------------------------------------------------------------
 
