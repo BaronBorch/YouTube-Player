@@ -243,7 +243,6 @@ void on_focus_change_color(GtkWidget *widget)
 
 void enter_clicked()
 {
-    int error;
     FILE *wpa = fopen("/home/pi/wpa.conf", "w");
     if (wpa == NULL)
 	printf("Error opening file!\n");
@@ -253,14 +252,13 @@ void enter_clicked()
     strcat(wpaconf, "\"\n	psk=\"");
     strcat(wpaconf, text);
     strcat(wpaconf, "\"\n}");
-    error = fprintf(wpa, wpaconf);
-    printf("Error z gtk keyboard  = %i\n", error);
+    fprintf(wpa, wpaconf);
     fclose(wpa);
 
     g_print("Enter clicked, password is: %s\n", text);
+    strcpy(text, "");
     gtk_widget_destroy(window);
     gtk_main_quit();
-    call(password);
 }
 
 int gui_keyboard(char login[20])

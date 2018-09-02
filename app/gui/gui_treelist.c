@@ -86,8 +86,8 @@ int treelist()
     GtkTreeSelection *selection;
     GtkCssProvider *cssProvider;
     FILE *file_d;
-    char web[20], web2[20], web3[20], web4[20], web5[20];
-    int not, not2, not3, not4, not5;
+    char web[20], web1[20], web2[20], web3[20], web4[20], web5[20], web6[20], web7[20], web8[20], web9[20];
+    int not, not1, not2, not3, not4, not5, not6, not7, not8, not9;
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     list = gtk_tree_view_new();
@@ -118,16 +118,28 @@ int treelist()
     file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 3p", "r");
     not = fscanf(file_d, "%s", web);
     file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 4p", "r");
-    not2 = fscanf(file_d, "%s", web2);
+    not1 = fscanf(file_d, "%s", web1);
     file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 5p", "r");
-    not3 = fscanf(file_d, "%s", web3);
+    not2 = fscanf(file_d, "%s", web2);
     file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 6p", "r");
-    not4 = fscanf(file_d, "%s", web4);
+    not3 = fscanf(file_d, "%s", web3);
     file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 7p", "r");
+    not4 = fscanf(file_d, "%s", web4);
+    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 8p", "r");
     not5 = fscanf(file_d, "%s", web5);
+    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 9p", "r");
+    not6 = fscanf(file_d, "%s", web6);
+    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 10p", "r");
+    not7 = fscanf(file_d, "%s", web7);
+    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 11p", "r");
+    not8 = fscanf(file_d, "%s", web8);
+    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 12p", "r");
+    not9 = fscanf(file_d, "%s", web9);
 
     if(not >= 0)
         add_to_list(list, web);
+    if(not1 >= 0)
+        add_to_list(list, web1);
     if(not2 >= 0)
         add_to_list(list, web2);
     if(not3 >= 0)
@@ -136,6 +148,16 @@ int treelist()
         add_to_list(list, web4);
     if(not5 >= 0)
         add_to_list(list, web5);
+    if(not6 >= 0)
+        add_to_list(list, web6);
+    if(not7 >= 0)
+        add_to_list(list, web7);
+    if(not8 >= 0)
+        add_to_list(list, web8);
+    if(not9 >= 0)
+        add_to_list(list, web9);
+
+    pclose(file_d);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
 

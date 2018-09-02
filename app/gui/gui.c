@@ -8,7 +8,7 @@
 #include "gui_treelist.h"
 #include "gui_keyboard.h"
 
-GtkWidget *window, *window2, *window3, *spin;
+GtkWidget *window, *window2, *window3, *spin, *fixed;
 gboolean active;
 event_cb button_OK_connected_cb; 
 event_cb connect_with_wps;
@@ -148,7 +148,7 @@ void gui_show_volumebar(int height, char inscription[5])
     strncpy(value, inscription, 5);
     gui_hided = 0;
 
-    gtk_widget_queue_draw(window);
+    gtk_widget_queue_draw(GTK_WIDGET(window));
     gtk_widget_set_visible(window, TRUE);
     g_timeout_add(100, cback, NULL);
     gtk_main();
@@ -161,6 +161,28 @@ void *another_password_connect_func(void *vargp)
     return 0;
 }
 
+void focus_change_color(GtkWidget *widget)
+{
+    char focused_button_color[100];
+
+    strcpy(focused_button_color, "window #");
+    strcat(focused_button_color, gtk_widget_get_name(widget));
+
+    if(gtk_widget_is_focus(widget) == TRUE)
+        strcat(focused_button_color, " {background: cyan;}");
+    else
+    {
+        strcat(focused_button_color, " {background: gainsboro;}");
+    }
+
+    GtkCssProvider *cssProvider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
+    focused_button_color, -1, NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+            GTK_STYLE_PROVIDER(cssProvider),
+            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 gboolean button1_clicked(GtkWidget *widget, gpointer a)
 {
     printf("++ %s\n", __func__);
@@ -169,20 +191,23 @@ gboolean button1_clicked(GtkWidget *widget, gpointer a)
     if(i == 0)
     {
         call_callbacks(button_OK_connected_cb);
-        gtk_widget_destroy(window2);
+        g_object_unref(G_OBJECT(window2));
         gtk_main_quit();
+        gtk_widget_destroy(GTK_WIDGET(window2));
     }
     else if(i == 1)
     {
-        gtk_widget_destroy(window2);
+        g_object_unref(G_OBJECT(window2));
         gtk_main_quit();
+        gtk_widget_destroy(GTK_WIDGET(window2));
         draw_statement("", 2);
     }
     else if(i == 2)
     {
         call_callbacks(connect_with_wps);
-        gtk_widget_destroy(window2);
+        g_object_unref(G_OBJECT(window2));
         gtk_main_quit();
+        gtk_widget_destroy(window2);
         printf("button 1 clicked if 2 waitscreen start\n");
         wait_screen_start();
     }
@@ -190,15 +215,18 @@ gboolean button1_clicked(GtkWidget *widget, gpointer a)
     return FALSE;
 }
 
-gboolean button2_clicked(GtkWidget *widget, gpointer a)
+gboolean button2_clicked(GtkWidget *widget)
 {
     printf("++ %s\n", __func__);
-    gtk_widget_destroy(window2);
+    system("wpa_cli scan");
+    sleep(1);
     gtk_main_quit();
+    gtk_widget_destroy(window2);
+    g_object_unref(G_OBJECT(window2));
+    printf("unref in button2 clicked func\n");
     treelist();
     pthread_create(&thread1, NULL, another_password_connect_func, NULL);
     wait_screen_start();
-    printf("wpa.conf done\n");
     printf("-- %s\n", __func__);
     return FALSE;
 }
@@ -207,11 +235,12 @@ void draw_statement(char statement[40], int wps_dc)
 {
     if(window_active == 3)
     {
-        gtk_widget_destroy(window3);
+        gtk_widget_destroy(GTK_WIDGET(window3));
+        g_object_unref(G_OBJECT(window3));
         printf("   %s spin stop\n", __func__);
     }
 
-    GtkWidget *fixed, *button1, *label;
+    GtkWidget *button1, *label;
     printf("++ %s\n", __func__);
 
     window_active = 2;
@@ -224,6 +253,8 @@ void draw_statement(char statement[40], int wps_dc)
     gtk_window_fullscreen (GTK_WINDOW (window2));
     gtk_widget_set_app_paintable(window2, FALSE);
     gtk_window_set_decorated (GTK_WINDOW (window2), FALSE);
+    gtk_window_set_deletable (GTK_WINDOW (window2), TRUE);
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (window2), TRUE);
     gtk_container_add(GTK_CONTAINER(window2), fixed);
 
     gtk_label_set_markup(GTK_LABEL(label), statement);
@@ -235,6 +266,7 @@ void draw_statement(char statement[40], int wps_dc)
         GtkWidget *label1, *button2;
         label1 = gtk_label_new(NULL);
         button2 = gtk_button_new_with_label("Enter password");
+
         gtk_label_set_markup(GTK_LABEL(label1), "Select the connection method");
         gtk_fixed_put(GTK_FIXED (fixed), label1, 550, 345);
         gtk_button_set_label(GTK_BUTTON(button1), "WPS");
@@ -242,7 +274,11 @@ void draw_statement(char statement[40], int wps_dc)
         gtk_widget_set_size_request(button2, 200, 50);
         gtk_fixed_put (GTK_FIXED (fixed), button1, 327, 385);
         gtk_fixed_put (GTK_FIXED (fixed), button2, 854, 385);
+        gtk_widget_set_name (button1, "button_2");
+        gtk_widget_set_name (button2, "button_3");
         g_signal_connect(button2, "clicked", G_CALLBACK(button2_clicked), NULL);
+        g_signal_connect(button1, "event-after", G_CALLBACK(focus_change_color), NULL);
+        g_signal_connect(button2, "event-after", G_CALLBACK(focus_change_color), NULL);
     }
 
     if(wps_dc == 2)
