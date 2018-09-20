@@ -8,12 +8,13 @@
 #include <signal.h>
 #include <unistd.h>
 #include "input/input.h"
-#include "gui/gui.h"
+#include "gui/gui_draw_state.h"
+#include "gui/gui_volumebar.h"
 #include "app.h"
 
 pthread_mutex_t Mutex, Mutex2;
-pthread_t thread1, thread2;
-int OK_button_chceck = 0, internet_access = 0, a = 0;
+pthread_t thread1, thread2, thread3;
+int pass_connect_check = 0, scan_counter = 0;
 event_cb internet_connection;
 
 void check_internet_connect();
@@ -71,8 +72,10 @@ void *wps_thread(void *vargp)
 
     if(n == ETIMEDOUT)
     {
-        check_internet_connect();
+        scan_counter++;
+        printf("\nscan_counter = %d\n", scan_counter);
         printf("%s\n", "checking wps scan");
+        check_internet_connect();
     }
     return 0;
 }
@@ -91,12 +94,10 @@ void handle_volume_change()
     pclose(file_p);
 
     if(converted_volume_val < 0)
-    {
         converted_volume_val = 0;
-    }
 
     snprintf(volume_to_show, 5, "%d", converted_volume_val);
-    printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
+    printf( "%s\n", volume_to_show);
 
     pthread_mutex_unlock(&Mutex);
     pthread_join(thread1, NULL);
@@ -112,83 +113,130 @@ void set_HDMI()
     fscanf(file_d, "%i", &display_state);
 
     if(display_state == 1)
-    {
         system("vcgencmd display_power 0");
-    }
     else
-    {
         system("vcgencmd display_power 1");
-    }
     pclose(file_d);
+}
+
+void clear_last_network()
+{
+    printf("++ %s\n", __func__);
+    int number_of_lines;
+    FILE *lines = popen("wc -l < /etc/wpa_supplicant/wpa_supplicant.conf", "r");
+    fscanf(lines, "%i", &number_of_lines);
+    printf("number_of_lines = %i\n", number_of_lines);
+
+    if(number_of_lines >= 7)
+    {
+        int a;
+        for(a = 0; a<4; a++)
+        {
+            system("sudo sed -i '$d' /etc/wpa_supplicant/wpa_supplicant.conf");
+            printf("clear line, a = %d\n", a);
+        }
+    }
+    fclose(lines);
+    printf("-- %s\n", __func__);
 }
 
 void check_internet_connect()
 {
-    if(internet_access == 0)
+    switch(system("ping -c1 www.google.com"))
     {
-        switch(system("ping -c1 www.google.com"))
+        case 0:
         {
-            case 0:
-            {
-                OK_button_chceck = 1;
-                printf("%s\n", "internet connection OK");
-                draw_statement("Internet connected", 0);
-                internet_access = 1;
-            }
-            break;
-            case 512:
-            {
-                OK_button_chceck = 1;
-                printf("%s\n", "no internet");
-                FILE *file_e;
-                char wpa_state[10];
+            printf("%s\n", "internet connection OK");
+            draw_statement("Internet connected", 0);
+            if(pass_connect_check == 1)
+                pass_connect_check = 0;
+        }
+        break;
+        case 512:
+        {
+            printf("%s\n", "no internet");
+            FILE *file_e;
+            char wpa_state[10];
 
-                file_e = popen("wpa_cli status | grep 'wpa_state=' | tr -d '[wpa_state=]'", "r" );
-                fscanf(file_e, "%s", wpa_state);
-                printf("%s\n", wpa_state);
+            file_e = popen("wpa_cli status | grep 'wpa_state=' | tr -d '[wpa_state=]'", "r" );
+            fscanf(file_e, "%s", wpa_state);
+            printf("%s\n", wpa_state);
 
-                if((strcmp("DISCONNECTED", wpa_state) == 0) || (strcmp("INACTIVE", wpa_state) == 0))
+            if((strcmp("DISCONNECTED", wpa_state) == 0) || (strcmp("INACTIVE", wpa_state) == 0))
+            {
+                printf("%s\n", "WiFi disconnected");
+                if(pass_connect_check == 1)
                 {
-                    OK_button_chceck = 1;
-                    printf("%s\n", "WiFi disconnected");
+                    clear_last_network();
+                    pass_connect_check = 0;
+                    draw_statement("Wrong password", 1);
+                }
+                else
                     draw_statement("No internet connection", 1);
-                }
+            }
 
-                else if((strcmp("COMPLETED", wpa_state) == 0) || (strcmp("ASSOCIATED", wpa_state) == 0))
-                {
-                    OK_button_chceck = 1;
-                    printf("%s\n", "WiFi conected");
-                    draw_statement("WiFi conected", 0);
-                    internet_access = 1;
-                }
+            else if((strcmp("COMPLETED", wpa_state) == 0) || (strcmp("ASSOCIATED", wpa_state) == 0))
+            {
+                printf("%s\n", "WiFi conected");
+                if(pass_connect_check == 1)
+                    pass_connect_check = 0;
+                draw_statement("WiFi conected", 0);
 
+<<<<<<< HEAD
                 else if(strcmp("SCANNING", wpa_state) == 0)
                 {
                     OK_button_chceck = 0;
                     printf("%s\n", "scanning");
                     pthread_create(&thread2, NULL, wps_thread, NULL);
                 }
-
-                else
-                {
-                    printf("%s\n", "else Nie można pobrać statusu wpa_supplicant :(");
-                }
-                pclose(file_e);
+=======
             }
-            break;
-            default:
+>>>>>>> WiFi_Setup
+
+            else if(strcmp("SCANNING", wpa_state) == 0)
             {
+                printf("%s\n", "scanning");
+                pthread_create(&thread2, NULL, wps_thread, NULL);
+                if(scan_counter == 3)
+                {
+                    system("wpa_cli disconnect");
+                    scan_counter = 0;
+                }
+            }
+
+            else if(strcmp("4WAYHANDSHAKE", wpa_state) == 0)
+            {
+                printf("%s\n", "4WAYHANDSHAKE");
+                int t = pthread_create(&thread3, NULL, wps_thread, NULL);
+                printf("pthread return = %d\n", t);
+            }
+
+            else
+            {
+<<<<<<< HEAD
                 OK_button_chceck = 0;
                 draw_statement("Something went wrong :(", 2);
                 printf("%s\n", "inactive Wystąpił błąd :(");
+=======
+                printf("%s\n", "else Nie można pobrać statusu wpa_supplicant :(");
+                draw_statement("Something went wrong :(", 1);
+>>>>>>> WiFi_Setup
             }
-            break;
+            pclose(file_e);
         }
+        break;
+        default:
+        {
+            printf("%s\n", "inactive Wystąpił błąd :(");
+            draw_statement("Something went wrong :(", 1);
+        }
+        break;
     }
 }
 
 void wps_connect()
 {
+<<<<<<< HEAD
     if(internet_access == 0)
     {
         system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
@@ -210,11 +258,37 @@ void connect_with_pass()
     system("sudo wpa_supplicant -Dwext -iwlan0 -c/home/pi/wpa.conf -B");
     sleep(10);
     check_internet_connect();
+=======
+    system("wpa_cli wps_pbc");
+    printf("%s\n", "wps connect here, trying to connect");
+    check_internet_connect();
+}
+
+void run_yt()
+{
+    call_cb(internet_connection);
+}
+
+void connect_with_pass()
+{
+    printf("++ %s\n", __func__);
+    system("wpa_cli reconfigure");
+    system("wpa_cli reconnect");
+    pass_connect_check = 1;
+    sleep(7);
+    check_internet_connect();
+    printf("-- %s\n", __func__);
+>>>>>>> WiFi_Setup
 }
 
 void app()
 {
     printf("++ %s\n", __func__);
+<<<<<<< HEAD
+=======
+    system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
+    system("sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf");
+>>>>>>> WiFi_Setup
     register_button_OK_connected_callback(run_yt);
     register_button_OK_connect_with_wps_callback(wps_connect);
     register_connect_with_password(connect_with_pass);
