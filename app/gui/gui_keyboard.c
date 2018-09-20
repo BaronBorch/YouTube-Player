@@ -243,15 +243,15 @@ void on_focus_change_color(GtkWidget *widget)
 
 void enter_clicked()
 {
-    FILE *wpa = fopen("/home/pi/wpa.conf", "w");
+    FILE *wpa = fopen("/etc/wpa_supplicant/wpa_supplicant.conf", "a+");
     if (wpa == NULL)
 	printf("Error opening file!\n");
 
-    char wpaconf[200] =     "network={\n	ssid=\"";
+    char wpaconf[200] ="network={\n	ssid=\"";
     strcat(wpaconf, ssid);
     strcat(wpaconf, "\"\n	psk=\"");
     strcat(wpaconf, text);
-    strcat(wpaconf, "\"\n}");
+    strcat(wpaconf, "\"\n}\n");
     fprintf(wpa, wpaconf);
     fclose(wpa);
 

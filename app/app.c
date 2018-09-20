@@ -8,12 +8,13 @@
 #include <signal.h>
 #include <unistd.h>
 #include "input/input.h"
-#include "gui/gui.h"
+#include "gui/gui_draw_state.h"
+#include "gui/gui_volumebar.h"
 #include "app.h"
 
 pthread_mutex_t Mutex, Mutex2;
-pthread_t thread1, thread2;
-int pass_connect_check = 0;
+pthread_t thread1, thread2, thread3;
+int pass_connect_check = 0, scan_counter = 0;
 event_cb internet_connection;
 
 void check_internet_connect();
@@ -71,8 +72,10 @@ void *wps_thread(void *vargp)
 
     if(n == ETIMEDOUT)
     {
-        check_internet_connect();
+        scan_counter++;
+        printf("\nscan_counter = %d\n", scan_counter);
         printf("%s\n", "checking wps scan");
+        check_internet_connect();
     }
     return 0;
 }
@@ -91,12 +94,10 @@ void handle_volume_change()
     pclose(file_p);
 
     if(converted_volume_val < 0)
-    {
         converted_volume_val = 0;
-    }
 
     snprintf(volume_to_show, 5, "%d", converted_volume_val);
-    printf( "%s\n", volume_to_show); // tymczasowy sprawdzian czy dzia³a jak powinno.
+    printf( "%s\n", volume_to_show);
 
     pthread_mutex_unlock(&Mutex);
     pthread_join(thread1, NULL);
@@ -112,34 +113,31 @@ void set_HDMI()
     fscanf(file_d, "%i", &display_state);
 
     if(display_state == 1)
-    {
         system("vcgencmd display_power 0");
-    }
     else
-    {
         system("vcgencmd display_power 1");
-    }
     pclose(file_d);
 }
 
-void remember_password()
+void clear_last_network()
 {
     printf("++ %s\n", __func__);
-    system("sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf");
-    char network_name[30], search_network_command[100] = "head /etc/wpa_supplicant/wpa_supplicant.conf |grep ";
-    FILE *network_conf = popen("head /home/pi/wpa.conf |sed -n 2p |sed 's/ssid=//g'", "r");
-    fscanf(network_conf, "%s", network_name);
-    printf("%s\n", network_name);
-    strcat(search_network_command, network_name);
-    printf("%s\n", search_network_command);
-    pclose(network_conf);
+    int number_of_lines;
+    FILE *lines = popen("wc -l < /etc/wpa_supplicant/wpa_supplicant.conf", "r");
+    fscanf(lines, "%i", &number_of_lines);
+    printf("number_of_lines = %i\n", number_of_lines);
 
-    if(system(search_network_command) == 256)
+    if(number_of_lines >= 7)
     {
-        printf("%i\n", system("cat /home/pi/wpa.conf >> /etc/wpa_supplicant/wpa_supplicant.conf"));
-        printf("added new network to wpa_supplicant.conf\n");
+        int a;
+        for(a = 0; a<4; a++)
+        {
+            system("sudo sed -i '$d' /etc/wpa_supplicant/wpa_supplicant.conf");
+            printf("clear line, a = %d\n", a);
+        }
     }
-        printf("-- %s\n", __func__);
+    fclose(lines);
+    printf("-- %s\n", __func__);
 }
 
 void check_internet_connect()
@@ -151,10 +149,7 @@ void check_internet_connect()
             printf("%s\n", "internet connection OK");
             draw_statement("Internet connected", 0);
             if(pass_connect_check == 1)
-            {
-                remember_password();
                 pass_connect_check = 0;
-            }
         }
         break;
         case 512:
@@ -172,8 +167,9 @@ void check_internet_connect()
                 printf("%s\n", "WiFi disconnected");
                 if(pass_connect_check == 1)
                 {
-                    draw_statement("Wrong password", 1);
+                    clear_last_network();
                     pass_connect_check = 0;
+                    draw_statement("Wrong password", 1);
                 }
                 else
                     draw_statement("No internet connection", 1);
@@ -182,33 +178,42 @@ void check_internet_connect()
             else if((strcmp("COMPLETED", wpa_state) == 0) || (strcmp("ASSOCIATED", wpa_state) == 0))
             {
                 printf("%s\n", "WiFi conected");
+                if(pass_connect_check == 1)
+                    pass_connect_check = 0;
                 draw_statement("WiFi conected", 0);
+
             }
 
             else if(strcmp("SCANNING", wpa_state) == 0)
             {
                 printf("%s\n", "scanning");
                 pthread_create(&thread2, NULL, wps_thread, NULL);
+                if(scan_counter == 3)
+                {
+                    system("wpa_cli disconnect");
+                    scan_counter = 0;
+                }
+            }
+
+            else if(strcmp("4WAYHANDSHAKE", wpa_state) == 0)
+            {
+                printf("%s\n", "4WAYHANDSHAKE");
+                int t = pthread_create(&thread3, NULL, wps_thread, NULL);
+                printf("pthread return = %d\n", t);
             }
 
             else
             {
                 printf("%s\n", "else Nie można pobrać statusu wpa_supplicant :(");
-                if(pass_connect_check == 1)
-                {
-                    system("sudo killall wpa_supplicant");
-                    sleep(2);
-                    system("sudo wpa_supplicant -Dwext -iwlan0 -c/etc/wpa_supplicant/wpa_supplicant.conf -B");
-                    check_internet_connect();
-                }
+                draw_statement("Something went wrong :(", 1);
             }
             pclose(file_e);
         }
         break;
         default:
         {
-            draw_statement("Something went wrong :(", 1);
             printf("%s\n", "inactive Wystąpił błąd :(");
+            draw_statement("Something went wrong :(", 1);
         }
         break;
     }
@@ -229,11 +234,10 @@ void run_yt()
 void connect_with_pass()
 {
     printf("++ %s\n", __func__);
-    printf("%i\n", system("sudo killall wpa_supplicant"));
-    sleep(2);
-    printf("%i\n", system("sudo wpa_supplicant -Dwext -iwlan0 -c/home/pi/wpa.conf -B"));
-    sleep(10);
+    system("wpa_cli reconfigure");
+    system("wpa_cli reconnect");
     pass_connect_check = 1;
+    sleep(7);
     check_internet_connect();
     printf("-- %s\n", __func__);
 }
@@ -242,6 +246,7 @@ void app()
 {
     printf("++ %s\n", __func__);
     system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
+    system("sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf");
     register_button_OK_connected_callback(run_yt);
     register_button_OK_connect_with_wps_callback(wps_connect);
     register_connect_with_password(connect_with_pass);
