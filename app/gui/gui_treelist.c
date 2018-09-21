@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <string.h>
 #include "gui_treelist.h"
 #include "gui_keyboard.h"
 
@@ -86,8 +87,8 @@ int treelist()
     GtkTreeSelection *selection;
     GtkCssProvider *cssProvider;
     FILE *file_d;
-    char web[20], web1[20], web2[20], web3[20], web4[20], web5[20], web6[20], web7[20], web8[20], web9[20];
-    int not, not1, not2, not3, not4, not5, not6, not7, not8, not9;
+    char web[50][50], char_i[5], command[80];
+    int i, nr_of_lines, not[50];
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     list = gtk_tree_view_new();
@@ -115,49 +116,28 @@ int treelist()
 
     init_list(list);
 
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 3p", "r");
-    not = fscanf(file_d, "%s", web);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 4p", "r");
-    not1 = fscanf(file_d, "%s", web1);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 5p", "r");
-    not2 = fscanf(file_d, "%s", web2);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 6p", "r");
-    not3 = fscanf(file_d, "%s", web3);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 7p", "r");
-    not4 = fscanf(file_d, "%s", web4);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 8p", "r");
-    not5 = fscanf(file_d, "%s", web5);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 9p", "r");
-    not6 = fscanf(file_d, "%s", web6);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 10p", "r");
-    not7 = fscanf(file_d, "%s", web7);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 11p", "r");
-    not8 = fscanf(file_d, "%s", web8);
-    file_d = popen("wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n 12p", "r");
-    not9 = fscanf(file_d, "%s", web9);
+    FILE *file_e = popen("wpa_cli scan_results |wc -l", "r");
+    fscanf(file_e, "%i", &nr_of_lines);
+    printf("number of lines = %d\n", nr_of_lines);
 
-    if(not >= 0)
-        add_to_list(list, web);
-    if(not1 >= 0)
-        add_to_list(list, web1);
-    if(not2 >= 0)
-        add_to_list(list, web2);
-    if(not3 >= 0)
-        add_to_list(list, web3);
-    if(not4 >= 0)
-        add_to_list(list, web4);
-    if(not5 >= 0)
-        add_to_list(list, web5);
-    if(not6 >= 0)
-        add_to_list(list, web6);
-    if(not7 >= 0)
-        add_to_list(list, web7);
-    if(not8 >= 0)
-        add_to_list(list, web8);
-    if(not9 >= 0)
-        add_to_list(list, web9);
+    for(i = 0; i < (nr_of_lines - 2); i++)
+    {
+        strcpy(command, "wpa_cli scan_results |sed 's/^.*]/]/' | tr -d '[] ]'|sed -n ");
+        sprintf(char_i,"%d", i + 3);
+        strcat(command, char_i);
+        strcat(command, "p"); 
+        file_d = popen(command, "r");
+        not[i] = fscanf(file_d, "%s", web[i]);
+    }
+
+    for(i = 0; i < (nr_of_lines - 2); i++)
+    {
+        if(not[i] >= 0)
+            add_to_list(list, web[i]);
+    }
 
     pclose(file_d);
+    pclose(file_e);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
 

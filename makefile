@@ -1,15 +1,7 @@
-<<<<<<< HEAD
-
-YTPlayer: gui.o input.o app.o main.o clean
-	gcc -Wall -o YTPlayer app/gui/gui.c app/input/input.c app/app.c main.c -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
-=======
->>>>>>> WiFi_Setup
 
 YTPlayer: gui_keyboard.o gui_treelist.o gui_volumebar.o gui_wait_screen.o gui_draw_state.o input.o app.o main.o clean
 	gcc -Wall -o YTPlayer app/gui/gui_keyboard.c app/gui/gui_treelist.c app/gui/gui_volumebar.c app/gui/gui_wait_screen.c app/gui/gui_draw_state.c app/input/input.c app/app.c main.c -lpthread `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
-<<<<<<< HEAD
-=======
 gui_keyboard.o: app/gui/gui_keyboard.c
 	gcc -c app/gui/gui_keyboard.c `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
@@ -25,7 +17,6 @@ gui_wait_screen.o: app/gui/gui_wait_screen.c
 gui_draw_state.o: app/gui/gui_draw_state.c
 	gcc -c app/gui/gui_draw_state.c `pkg-config --libs gtk+-3.0 --cflags gtk+-3.0`
 
->>>>>>> WiFi_Setup
 input.o: app/input/input.c
 	gcc -c app/input/input.c
 
@@ -36,8 +27,4 @@ main.o: main.c
 	gcc -c main.c
 
 clean:
-<<<<<<< HEAD
-	rm gui.o input.o app.o main.o
-=======
 	rm gui_keyboard.o gui_treelist.o gui_volumebar.o gui_wait_screen.o gui_draw_state.o input.o app.o main.o
->>>>>>> WiFi_Setup

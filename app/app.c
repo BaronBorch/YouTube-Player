@@ -182,16 +182,7 @@ void check_internet_connect()
                     pass_connect_check = 0;
                 draw_statement("WiFi conected", 0);
 
-<<<<<<< HEAD
-                else if(strcmp("SCANNING", wpa_state) == 0)
-                {
-                    OK_button_chceck = 0;
-                    printf("%s\n", "scanning");
-                    pthread_create(&thread2, NULL, wps_thread, NULL);
-                }
-=======
             }
->>>>>>> WiFi_Setup
 
             else if(strcmp("SCANNING", wpa_state) == 0)
             {
@@ -213,14 +204,8 @@ void check_internet_connect()
 
             else
             {
-<<<<<<< HEAD
-                OK_button_chceck = 0;
-                draw_statement("Something went wrong :(", 2);
-                printf("%s\n", "inactive Wystąpił błąd :(");
-=======
                 printf("%s\n", "else Nie można pobrać statusu wpa_supplicant :(");
                 draw_statement("Something went wrong :(", 1);
->>>>>>> WiFi_Setup
             }
             pclose(file_e);
         }
@@ -236,29 +221,6 @@ void check_internet_connect()
 
 void wps_connect()
 {
-<<<<<<< HEAD
-    if(internet_access == 0)
-    {
-        system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
-        system("wpa_cli wps_pbc");
-        printf("%s\n", "wps connect here, trying to connect");
-        check_internet_connect();
-    }
-}
-
-void run_yt()
-{
-    call_cb(internet_connection);
-}
-
-void connect_with_pass()
-{
-    system("sudo killall wpa_supplicant");
-    sleep(2);
-    system("sudo wpa_supplicant -Dwext -iwlan0 -c/home/pi/wpa.conf -B");
-    sleep(10);
-    check_internet_connect();
-=======
     system("wpa_cli wps_pbc");
     printf("%s\n", "wps connect here, trying to connect");
     check_internet_connect();
@@ -278,17 +240,13 @@ void connect_with_pass()
     sleep(7);
     check_internet_connect();
     printf("-- %s\n", __func__);
->>>>>>> WiFi_Setup
 }
 
 void app()
 {
     printf("++ %s\n", __func__);
-<<<<<<< HEAD
-=======
     system("sudo rm /var/run/wpa_supplicant/p2p-dev-wlan0");
     system("sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf");
->>>>>>> WiFi_Setup
     register_button_OK_connected_callback(run_yt);
     register_button_OK_connect_with_wps_callback(wps_connect);
     register_connect_with_password(connect_with_pass);
