@@ -15,19 +15,13 @@ gboolean button_click(GtkWidget *widget, GdkEvent *event, gpointer a)
 {
     printf("++ %s\n", __func__);
     guint keyval;
-    GtkWidget *label;
 
-    label = g_object_get_data(G_OBJECT(widget), "label");
     gdk_event_get_keyval(event, &keyval);
 
     if(keyval == GDK_KEY_Return)
     {
-        g_print ("%s\n", value);
-        gtk_widget_hide(a);
-        gtk_label_set_markup(GTK_LABEL(label), "Enter password: ");
-
-        gui_keyboard(value);
         gtk_widget_destroy(GTK_WIDGET(widget));
+        gui_keyboard(value);
         gtk_main_quit();
     }
     return FALSE;
@@ -79,6 +73,26 @@ void on_changed(GtkWidget *widget)
     printf("-- %s\n", __func__);
 }
 
+gboolean allocate_widget(gpointer a)
+{
+    int window_width = 1920, window_height = 1080, label_width, list_width, list_height;
+    GtkWidget *label = g_object_get_data(G_OBJECT(a), "label_data");
+    GtkWidget *fixed = g_object_get_data(G_OBJECT(a), "fixed_data");
+    GtkWidget *list = g_object_get_data(G_OBJECT(a), "list_data");
+
+    label_width = gtk_widget_get_allocated_width(label);
+    list_width = gtk_widget_get_allocated_width(list);
+    list_height = gtk_widget_get_allocated_height(list);
+
+    gtk_fixed_move(GTK_FIXED(fixed), list, ((window_width/2) - (list_width/2)), (window_height/2)-(list_height/2));
+    gtk_fixed_move(GTK_FIXED(fixed), label, ((window_width/2) - (label_width/2)), ((window_height/2)-(list_height/2)) - 60);
+
+    if(label_width > 1)
+        return FALSE;
+    else
+        return TRUE;
+}
+
 int treelist()
 {
     printf("++ %s\n", __func__);
@@ -106,8 +120,11 @@ int treelist()
     gtk_label_set_markup(GTK_LABEL(label), "Select network: ");
     gtk_fixed_put (GTK_FIXED (fixed), label, 550, 160);
     gtk_widget_set_name (label, "label");
+    g_object_set_data(G_OBJECT(window), "label_data", label);
+    g_object_set_data(G_OBJECT(window), "fixed_data", fixed);
+    g_object_set_data(G_OBJECT(window), "list_data", list);
     gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider),
-        "#label {font-size: 25px;}", -1, NULL);
+        "#label {font-size: 30px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -141,9 +158,9 @@ int treelist()
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
 
-    g_object_set_data(G_OBJECT(window), "label", label);
     g_signal_connect(G_OBJECT(selection), "changed", G_CALLBACK(on_changed), NULL);
     g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK (button_click), (gpointer)list);
+    g_timeout_add(100, allocate_widget, (gpointer)window);
 
     gtk_widget_show_all(window);
     gtk_main();

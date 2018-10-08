@@ -23,7 +23,7 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, 0, 60, 200);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_background_img.png");
+    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_background_img.png");
     cairo_image_surface_get_height (image);
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
@@ -40,7 +40,7 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, gap, 60, rect_height);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YTPlayer/YouTube-Player/app/gui/volumebar_foreground_img.png");
+    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_foreground_img.png");
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
     cairo_surface_destroy (image);
@@ -81,7 +81,7 @@ void gui_init()
     printf("++ %s\n", __func__);
     gtk_init(0, 0);
     volumebar_window = gtk_window_new(GTK_WINDOW_POPUP);
-    gtk_window_move(GTK_WINDOW(volumebar_window), 1280, 548);
+    gtk_window_move(GTK_WINDOW(volumebar_window), 1820, 840);
     gtk_window_set_default_size(GTK_WINDOW(volumebar_window), 60, 200);
     gtk_widget_set_app_paintable(volumebar_window, TRUE);
 
