@@ -9,6 +9,7 @@ void wait_screen_stop()
     printf("++ %s\n", __func__);
     if(active == 1)
     {
+        gtk_spinner_stop(GTK_SPINNER(spin));
         gtk_widget_destroy(GTK_WIDGET(spin_window));
         active = 0;
     }
@@ -23,7 +24,6 @@ void wait_screen(GtkApplication *app, gpointer user_data)
 
     gtk_window_set_decorated (GTK_WINDOW (spin_window), FALSE);
     gtk_window_fullscreen (GTK_WINDOW (spin_window));
-    gtk_window_set_default_size(GTK_WINDOW(spin_window), 1380, 768);
     gtk_container_set_border_width (GTK_CONTAINER(spin_window), 30);
     gtk_container_add(GTK_CONTAINER(spin_window), spin);
     gtk_spinner_start (GTK_SPINNER (spin));

@@ -72,14 +72,14 @@ void focus_change_color(GtkWidget *widget)
 
 gboolean allocate_widgets(gpointer a)
 {
-    int window_width = 1920, window_height = 1080, label_width, label1_width, label2_width;
+    int window_width = 1920, window_height = 1080, label_width, label1_width;
     GtkWidget *label = g_object_get_data(G_OBJECT(a), "label_data");
     GtkWidget *fixed = g_object_get_data(G_OBJECT(a), "fixed_data");
     GtkWidget *button1 = g_object_get_data(G_OBJECT(a), "button1_data");
 
     label_width = gtk_widget_get_allocated_width(label);
 
-    if(window_if_value == 0)
+    if(window_if_value == 0 || window_if_value == 2)
     {
         gtk_fixed_move(GTK_FIXED(fixed), label, ((window_width/2) - (label_width/2)), (window_height*2)/5);
         gtk_fixed_move(GTK_FIXED(fixed), button1, ((window_width/2) - 150), (window_height*3)/5);
@@ -96,28 +96,16 @@ gboolean allocate_widgets(gpointer a)
         gtk_fixed_move(GTK_FIXED(fixed), button1, ((window_width-600)/3), (window_height*3)/5);
         gtk_fixed_move(GTK_FIXED(fixed), button2, ((((window_width-600)/3)*2)+300), (window_height*3)/5);
     }
-    else if(window_if_value == 2)
-    {
-        GtkWidget *label2 = g_object_get_data(G_OBJECT(a), "label2_data");
 
-        label2_width = gtk_widget_get_allocated_width(label2);
-
-        gtk_fixed_move(GTK_FIXED(fixed), label2, ((window_width/2) - (label2_width/2)), (window_height*2)/5);
-        gtk_fixed_move(GTK_FIXED(fixed), button1, ((window_width/2) - 150), (window_height*3)/5);
-    }
     refresh = refresh + 1;
 
     if(refresh >= 3)
     {
         refresh = 0;
-        printf("return true");
         return FALSE;
     }
     else
-    {
-        printf("return false");
         return TRUE;
-    }
 }
 
 gboolean button1_clicked(GtkWidget *widget, gpointer a)
@@ -168,7 +156,7 @@ void draw_statement(char statement[40], int wps_dc)
     sleep(1);
 
     GtkWidget *window2, *fixed, *button1, *label;
-    GtkCssProvider *cssProvider, *cssProvider1, *cssProvider2; 
+    GtkCssProvider *cssProvider, *cssProvider1; 
     printf("++ %s\n", __func__);
 
     window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -177,7 +165,6 @@ void draw_statement(char statement[40], int wps_dc)
     button1 = gtk_button_new_with_label("OK");
     cssProvider = gtk_css_provider_new();
     cssProvider1 = gtk_css_provider_new();
-    cssProvider2 = gtk_css_provider_new();
     int a = strlen(statement);
 
     gtk_window_fullscreen(GTK_WINDOW(window2));
@@ -205,7 +192,7 @@ void draw_statement(char statement[40], int wps_dc)
     {
         GtkWidget *label1, *button2;
         label1 = gtk_label_new(NULL);
-        button2 = gtk_button_new_with_label("Enter password");
+        button2 = gtk_button_new_with_label("Password");
 
         gtk_label_set_markup(GTK_LABEL(label1), "Please select connection method");
         gtk_fixed_put(GTK_FIXED(fixed), label1, 550, 345);
@@ -227,24 +214,13 @@ void draw_statement(char statement[40], int wps_dc)
     }
 
     if(wps_dc == 2)
-    {
-        GtkWidget *label2;
-        label2 = gtk_label_new(NULL);
-        gtk_label_set_markup(GTK_LABEL(label2), "To connect with WiFi press WPS button on your router and press OK");
-        gtk_fixed_put(GTK_FIXED(fixed), label2, 405, 345);
-        gtk_widget_set_name(label2, "label2");
-        g_object_set_data(G_OBJECT(window2), "label2_data", label2);
-        gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider2), "#label2 {font-size: 30px;}", -1, NULL);
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                               GTK_STYLE_PROVIDER(cssProvider2),
-                               GTK_STYLE_PROVIDER_PRIORITY_USER);
-    }
+        gtk_label_set_markup(GTK_LABEL(label), "To connect with WiFi press WPS button on your router and press OK");
 
     gtk_widget_grab_focus(button1);
     window_if_value = wps_dc;
 
     g_signal_connect(button1, "clicked", G_CALLBACK(button1_clicked), (gpointer)window2);
-    g_timeout_add(100, allocate_widgets, (gpointer)window2);
+    g_timeout_add(50, allocate_widgets, (gpointer)window2);
 
     gtk_widget_set_visible(window2, TRUE);
     gtk_widget_show_all(window2);

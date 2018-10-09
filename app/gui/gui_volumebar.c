@@ -23,7 +23,7 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, 0, 60, 200);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_background_img.png");
+    image = cairo_image_surface_create_from_png ("app/gui/volumebar_background_img.png");
     cairo_image_surface_get_height (image);
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
@@ -40,7 +40,7 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_rectangle(cr, 0, gap, 60, rect_height);
     cairo_clip (cr);
     cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_foreground_img.png");
+    image = cairo_image_surface_create_from_png ("app/gui/volumebar_foreground_img.png");
     cairo_set_source_surface (cr, image, 0, 0);
     cairo_paint (cr);
     cairo_surface_destroy (image);

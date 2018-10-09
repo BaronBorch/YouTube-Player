@@ -184,7 +184,7 @@ void chage_button_bg()
     {
 	   GtkCssProvider *cssProvider = gtk_css_provider_new();
 	   gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
-	   "window #button_shift_left {background: white;}" "window #button_shift_right {background: white;}", 
+	   "window #button_shift_left {background: LightGrey ;}" "window #button_shift_right {background: LightGrey ;}", 
 	   -1, NULL);
 	   gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
 			       GTK_STYLE_PROVIDER(cssProvider),
@@ -200,7 +200,7 @@ void chage_button_bg()
 	   }
 	   else
 	   {
-	       strcpy(color, "window #button_caps {background: white;}");
+	       strcpy(color, "window #button_caps {background: LightGrey ;}");
 	       caps_check = 0;
 	   }
 
@@ -215,7 +215,7 @@ void chage_button_bg()
     if((strcmp("Alt", text_label) == 0) || alt_check == 0)
     {
 	   if(alt_check == 0)
-	       strcpy(color, "window #button_alt_right {background: white;}");
+	       strcpy(color, "window #button_alt_right {background: LightGrey ;}");
 	   else
 	       strcpy(color, "window #button_alt_right {background: cyan;}");
 
@@ -239,7 +239,7 @@ void on_focus_change_color(GtkWidget *widget)
         strcat(focused_button_color, " {background: cyan;}");
     else
     {
-        strcat(focused_button_color, " {background: white;}");
+        strcat(focused_button_color, " {background: LightGrey ;}");
     }
 
     if(((strcmp("button_caps", gtk_widget_get_name(widget)) == 0) && caps_check != 0) ||

@@ -188,10 +188,12 @@ void check_internet_connect()
             {
                 printf("%s\n", "scanning");
                 pthread_create(&thread2, NULL, wps_thread, NULL);
-                if(scan_counter == 3)
+                if(scan_counter == 6)
                 {
                     system("wpa_cli disconnect");
                     scan_counter = 0;
+                    sleep(1);
+                    check_internet_connect();
                 }
             }
 
