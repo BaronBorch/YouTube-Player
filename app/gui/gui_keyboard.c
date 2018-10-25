@@ -380,7 +380,7 @@ int gui_keyboard(char login[20])
     gtk_label_set_markup(GTK_LABEL(label), text);
     gtk_fixed_put(GTK_FIXED(fixed), label, 350, 20);
     gtk_widget_set_name(label, "label");
-    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider), "#label {font-size: 20px;}", -1, NULL);
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider), "#label {font-size: 30px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -390,7 +390,7 @@ int gui_keyboard(char login[20])
     gtk_label_set_markup(GTK_LABEL(label_network_name), label_with_network_name);
     gtk_fixed_put(GTK_FIXED(fixed), label_network_name, 500 - (label_network_name_width/2), 150);
     gtk_widget_set_name(label_network_name, "label2");
-    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider2), "#label2 {font-size: 30px;}", -1, NULL);
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider2), "#label2 {font-size: 40px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider2),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);

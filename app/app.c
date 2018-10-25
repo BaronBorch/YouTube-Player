@@ -140,6 +140,16 @@ void clear_last_network()
     printf("-- %s\n", __func__);
 }
 
+void start_volumebar()
+{
+    gui_init();
+    input_read_start();
+    register_volume_up_callback(handle_volume_change);
+    register_volume_down_callback(handle_volume_change);
+    register_volume_mute_callback(handle_volume_change);
+    register_power_callback(set_HDMI);
+}
+
 void check_internet_connect()
 {
     switch(system("ping -c1 www.google.com"))
@@ -148,6 +158,7 @@ void check_internet_connect()
         {
             printf("%s\n", "internet connection OK");
             draw_statement("Internet connected", 0);
+            start_volumebar();
             if(pass_connect_check == 1)
                 pass_connect_check = 0;
         }
@@ -181,20 +192,22 @@ void check_internet_connect()
                 if(pass_connect_check == 1)
                     pass_connect_check = 0;
                 draw_statement("WiFi conected", 0);
-
+                start_volumebar();
             }
 
             else if(strcmp("SCANNING", wpa_state) == 0)
             {
                 printf("%s\n", "scanning");
-                pthread_create(&thread2, NULL, wps_thread, NULL);
                 if(scan_counter == 6)
                 {
                     system("wpa_cli disconnect");
+                    system("sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf");
                     scan_counter = 0;
                     sleep(1);
                     check_internet_connect();
                 }
+                else
+                    pthread_create(&thread2, NULL, wps_thread, NULL);
             }
 
             else if(strcmp("4WAYHANDSHAKE", wpa_state) == 0)
@@ -252,13 +265,7 @@ void app()
     register_button_OK_connected_callback(run_yt);
     register_button_OK_connect_with_wps_callback(wps_connect);
     register_connect_with_password(connect_with_pass);
-    register_volume_up_callback(handle_volume_change);
-    register_volume_down_callback(handle_volume_change);
-    register_volume_mute_callback(handle_volume_change);
-    register_power_callback(set_HDMI);
-
-    gui_init();
-    input_read_start();
+    draw_statement_init();
     check_internet_connect();
 
     printf("-- %s\n", __func__);

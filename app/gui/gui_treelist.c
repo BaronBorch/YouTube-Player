@@ -85,7 +85,7 @@ gboolean allocate_widget(gpointer a)
     list_height = gtk_widget_get_allocated_height(list);
 
     gtk_fixed_move(GTK_FIXED(fixed), list, ((window_width/2) - (list_width/2)), (window_height/2)-(list_height/2));
-    gtk_fixed_move(GTK_FIXED(fixed), label, ((window_width/2) - (label_width/2)), ((window_height/2)-(list_height/2)) - 60);
+    gtk_fixed_move(GTK_FIXED(fixed), label, ((window_width/2) - (label_width/2)), ((window_height/2)-(list_height/2)) - 100);
 
     if(label_width > 1)
         return FALSE;
@@ -97,18 +97,16 @@ int treelist()
 {
     printf("++ %s\n", __func__);
 
-    GtkWidget *window, *list, *fixed, *label;
-    GtkTreeSelection *selection;
-    GtkCssProvider *cssProvider;
     FILE *file_d;
     char web[50][50], char_i[5], command[80];
     int i, nr_of_lines, not[50];
 
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    list = gtk_tree_view_new();
-    fixed = gtk_fixed_new();
-    label = gtk_label_new(NULL);
-    cssProvider = gtk_css_provider_new();
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    GtkWidget *list = gtk_tree_view_new();
+    GtkWidget *fixed = gtk_fixed_new();
+    GtkWidget *label = gtk_label_new(NULL);
+    GtkCssProvider *cssProvider = gtk_css_provider_new();
+    GtkCssProvider *cssProvider1 = gtk_css_provider_new();
 
     gtk_window_fullscreen (GTK_WINDOW (window));
     gtk_widget_set_app_paintable(window, FALSE);
@@ -120,15 +118,20 @@ int treelist()
     gtk_label_set_markup(GTK_LABEL(label), "Select network: ");
     gtk_fixed_put (GTK_FIXED (fixed), label, 550, 160);
     gtk_widget_set_name (label, "label");
+    gtk_widget_set_name (list, "list");
     g_object_set_data(G_OBJECT(window), "label_data", label);
     g_object_set_data(G_OBJECT(window), "fixed_data", fixed);
     g_object_set_data(G_OBJECT(window), "list_data", list);
-    gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider),
-        "#label {font-size: 30px;}", -1, NULL);
+    gtk_css_provider_load_from_data (GTK_CSS_PROVIDER(cssProvider),
+        "#label {font-size: 40px; font-weight: bold; text-shadow: 5px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);
-
+    gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider1),
+        "#list {font-size: 25px; font-weight: bold; text-shadow: 5px;}", -1, NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+                               GTK_STYLE_PROVIDER(cssProvider1),
+                               GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_container_add(GTK_CONTAINER(window), fixed);
 
     init_list(list);
@@ -156,7 +159,7 @@ int treelist()
     pclose(file_d);
     pclose(file_e);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
 
     g_signal_connect(G_OBJECT(selection), "changed", G_CALLBACK(on_changed), NULL);
     g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK (button_click), (gpointer)list);
