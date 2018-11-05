@@ -22,13 +22,13 @@ gboolean draw_rect(GtkWidget *widget, cairo_t *cr)
     cairo_surface_t *image;
 
     cairo_rectangle(cr, 0, 0, 60, 200);
-    cairo_clip (cr);
-    cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_background_img.png");
-    cairo_image_surface_get_height (image);
-    cairo_set_source_surface (cr, image, 0, 0);
-    cairo_paint (cr);
-    cairo_surface_destroy (image);
+    cairo_clip(cr);
+    cairo_new_path(cr);
+    image = cairo_image_surface_create_from_png("/home/pi/project/YouTube-Player/app/gui/volumebar_background_img.png");
+    cairo_image_surface_get_height(image);
+    cairo_set_source_surface(cr, image, 0, 0);
+    cairo_paint(cr);
+    cairo_surface_destroy(image);
 
     return FALSE;
 }
@@ -39,40 +39,36 @@ gboolean draw_rect2 (GtkWidget *widget, cairo_t *cr)
     cairo_surface_t *image;
 
     cairo_rectangle(cr, 0, gap, 60, rect_height);
-    cairo_clip (cr);
-    cairo_new_path (cr);
-    image = cairo_image_surface_create_from_png ("/home/pi/project/YouTube-Player/app/gui/volumebar_foreground_img.png");
-    cairo_set_source_surface (cr, image, 0, 0);
-    cairo_paint (cr);
-    cairo_surface_destroy (image);
+    cairo_clip(cr);
+    cairo_new_path(cr);
+    image = cairo_image_surface_create_from_png("/home/pi/project/YouTube-Player/app/gui/volumebar_foreground_img.png");
+    cairo_set_source_surface(cr, image, 0, 0);
+    cairo_paint(cr);
+    cairo_surface_destroy(image);
 
     return FALSE;
 }
 
 gboolean draw_vol_value (GtkWidget *widget, cairo_t *cr)
 {
-    cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size (cr, 29.0);
+    cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 29.0);
 
     if(rect_height > 199)
-    {
-        cairo_move_to (cr, -1.0, 110.0);
-    }
+        cairo_move_to(cr, -1.0, 110.0);
+    
     else if(rect_height < 20)
-    {
-        cairo_move_to (cr, 20.0, 110.0);
-    }
+        cairo_move_to(cr, 20.0, 110.0);
+    
     else
-    {
-        cairo_move_to (cr, 9.0, 110.0);
-    }
+        cairo_move_to(cr, 9.0, 110.0);
 
-    cairo_text_path (cr, value);
-    cairo_set_source_rgba (cr, 0, 0, 0, 1);
+    cairo_text_path(cr, value);
+    cairo_set_source_rgba(cr, 0, 0, 0, 1);
     cairo_fill_preserve(cr);
-    cairo_set_source_rgb (cr, 1, 1, 1);
-    cairo_set_line_width (cr, 0.5);
-    cairo_stroke (cr);
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_set_line_width(cr, 0.5);
+    cairo_stroke(cr);
 
     return FALSE;
 }

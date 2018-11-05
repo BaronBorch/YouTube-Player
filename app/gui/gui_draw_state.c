@@ -8,11 +8,8 @@
 #include "gui_draw_state.h"
 #include "gui_treelist.h"
 #include "gui_keyboard.h"
-//#include "gui_wait_screen.h"
 
-event_cb button_OK_connected_cb; 
-event_cb connect_with_wps;
-event_cb password_connect;
+event_cb button_OK_connected_cb, connect_with_wps, password_connect;
 GtkWidget *draw_state_window, *spin_window;
 pthread_t thread1, thread2;
 int window_if_value, refresh = 0, active = 0, thread_status;
@@ -61,9 +58,7 @@ void focus_change_color(GtkWidget *widget)
     if(gtk_widget_is_focus(widget) == TRUE)
         strcat(focused_button_color, " {background: cyan;}");
     else
-    {
         strcat(focused_button_color, " {background: white;}");
-    }
 
     GtkCssProvider *cssProvider = gtk_css_provider_new();
     gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider), 
@@ -120,11 +115,11 @@ void wait_screen_stop()
     printf("-- %s\n", __func__);
 }
 
-gboolean pulse( gpointer data )
+gboolean pulse(gpointer data)
 {
     if(active == 1)
     {
-        gtk_progress_bar_pulse( GTK_PROGRESS_BAR( data ) );
+        gtk_progress_bar_pulse(GTK_PROGRESS_BAR(data));
         return TRUE;
     }
     else
@@ -145,7 +140,6 @@ int wait_screen_start()
     gtk_window_fullscreen(GTK_WINDOW(spin_window));
     gtk_container_add(GTK_CONTAINER(spin_window), spin_fixed);
     gtk_fixed_put(GTK_FIXED(spin_fixed), progressBar, 210, 700);
-    //gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(progressBar), 0.5);
     gtk_style_context_add_class(context, GTK_STYLE_CLASS_PROGRESSBAR);
     gtk_widget_set_name(progressBar, "progressBar");
     gtk_label_set_markup(GTK_LABEL(spin_label), "Connecting...\n\nPlease wait");
