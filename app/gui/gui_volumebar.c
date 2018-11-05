@@ -80,6 +80,7 @@ gboolean draw_vol_value (GtkWidget *widget, cairo_t *cr)
 void gui_init()
 {
     printf("++ %s\n", __func__);
+    XInitThreads();
     volumebar_window = gtk_window_new(GTK_WINDOW_POPUP);
     gtk_window_move(GTK_WINDOW(volumebar_window), 1820, 840);
     gtk_window_set_default_size(GTK_WINDOW(volumebar_window), 60, 200);
@@ -111,9 +112,14 @@ void gui_show_volumebar(int height, char inscription[5])
     strncpy(value, inscription, 5);
     gui_hided = 0;
 
+    printf("++ before queue draw %s\n", __func__);
+
     gtk_widget_queue_draw(volumebar_window);
+    printf("++ before set visible %s\n", __func__);
     gtk_widget_set_visible(volumebar_window, TRUE);
-    g_timeout_add(100, cback, NULL);
+    printf("++ before timeout add %s\n", __func__);
+    g_timeout_add(50, cback, NULL);
+    printf("++ before main %s\n", __func__);
     gtk_main();
     printf("-- %s\n", __func__);
 }

@@ -14,8 +14,8 @@ event_cb button_OK_connected_cb;
 event_cb connect_with_wps;
 event_cb password_connect;
 GtkWidget *draw_state_window, *spin_window;
-pthread_t thread1;
-int window_if_value, refresh = 0, active = 0;
+pthread_t thread1, thread2;
+int window_if_value, refresh = 0, active = 0, thread_status;
 
 void register_button_OK_connected_callback(event_cb a)
 {
@@ -40,15 +40,16 @@ void call_callbacks(event_cb a)
     }
 }
 
-void connect_with_password()
-{
-    call_callbacks(password_connect);
-}
-
 void *another_password_connect_func(void *vargp)
 {
     call_callbacks(password_connect);
-    return 0;
+    pthread_exit(NULL);
+}
+
+void *another_password_connect_func2(void *vargp)
+{
+    call_callbacks(connect_with_wps);
+    pthread_exit(NULL);
 }
 
 void focus_change_color(GtkWidget *widget)
@@ -90,12 +91,13 @@ gboolean allocate_widgets(gpointer a)
     {
         GtkWidget *label1 = g_object_get_data(G_OBJECT(a), "label1_data");
         GtkWidget *button2 = g_object_get_data(G_OBJECT(a), "button2_data");
+        GtkWidget *button3 = g_object_get_data(G_OBJECT(a), "button3_data");
 
         label1_width = gtk_widget_get_allocated_width(label1);
 
         gtk_fixed_move(GTK_FIXED(fixed), label, ((window_width/2) - (label_width/2)), (window_height*2)/5);
         gtk_fixed_move(GTK_FIXED(fixed), label1, ((window_width/2) - (label1_width/2)), (window_height*5)/10);
-        gtk_fixed_move(GTK_FIXED(fixed), button1, ((window_width-600)/3), (window_height*3)/5);
+        gtk_fixed_move(GTK_FIXED(fixed), button3, ((window_width-600)/3), (window_height*3)/5);
         gtk_fixed_move(GTK_FIXED(fixed), button2, ((((window_width-600)/3)*2)+300), (window_height*3)/5);
     }
 
@@ -112,9 +114,10 @@ gboolean allocate_widgets(gpointer a)
 
 void wait_screen_stop()
 {
-    gtk_widget_destroy(spin_window);
-    gtk_widget_destroyed (spin_window, NULL);    
+    printf("++ %s\n", __func__);   
+    gtk_window_close(GTK_WINDOW(spin_window));
     active = 0;    
+    printf("-- %s\n", __func__);
 }
 
 gboolean pulse( gpointer data )
@@ -130,6 +133,7 @@ gboolean pulse( gpointer data )
 
 int wait_screen_start()
 {
+    printf("++ %s\n", __func__);
     active = 1;
     spin_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     GtkWidget *progressBar = gtk_progress_bar_new();
@@ -147,7 +151,7 @@ int wait_screen_start()
     gtk_label_set_markup(GTK_LABEL(spin_label), "Connecting...\n\nPlease wait");
     gtk_fixed_put(GTK_FIXED (spin_fixed), spin_label, 850, 400);
     gtk_widget_set_name(spin_label, "spin_label");
-    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssProvider), "#progressBar {-GtkProgressBar-min-horizontal-bar-height: 50px; min-width: 1500px; color: blue;}"
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(cssProvider), "#progressBar {min-height: 50px; min-width: 1500px; color: blue;}"
         "#spin_label {font-size: 40px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
@@ -156,6 +160,7 @@ int wait_screen_start()
     g_timeout_add(90,(GSourceFunc)pulse, progressBar);
     gtk_widget_show_all(spin_window);
     gtk_main();
+    printf("-- %s\n", __func__);
     
     return 0;
 }
@@ -166,19 +171,15 @@ gboolean button1_clicked(GtkWidget *widget)
     printf("int window_if_value = %d\n", window_if_value);
     if(window_if_value == 0)
     {
+        printf("thread status = %d\n", thread_status);
         call_callbacks(button_OK_connected_cb);
-        gtk_main_quit();
         gtk_widget_destroy(draw_state_window);
-    }
-    else if(window_if_value == 1)
-    {
         gtk_main_quit();
-        draw_statement("", 2);
     }
     else if(window_if_value == 2)
     {
-        call_callbacks(connect_with_wps);
-        //gtk_widget_hide(draw_state_window);
+        pthread_join(thread1, NULL);
+        thread_status = pthread_create(&thread2, NULL, another_password_connect_func2, NULL);
         gtk_main_quit();
         wait_screen_start();
     }
@@ -191,25 +192,34 @@ gboolean button2_clicked(GtkWidget *widget)
     printf("++ %s\n", __func__);
     system("wpa_cli scan");
     sleep(1);
-    //gtk_widget_hide(draw_state_window);
     gtk_main_quit();
     treelist();
-    pthread_create(&thread1, NULL, another_password_connect_func, NULL);
+    pthread_join(thread2, NULL);
+    thread_status = pthread_create(&thread1, NULL, another_password_connect_func, NULL);
     wait_screen_start();
     printf("-- %s\n", __func__);
+    return FALSE;
+}
+
+gboolean button3_clicked(GtkWidget *widget)
+{
+    draw_statement("", 2);
     return FALSE;
 }
 
 void draw_statement_init()
 {
     printf("++ %s\n", __func__);
+    XInitThreads();
     gtk_init(0, 0);
+
     draw_state_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     GtkWidget *fixed = gtk_fixed_new();
     GtkWidget *label = gtk_label_new(NULL);
     GtkWidget *label1 = gtk_label_new(NULL);
     GtkWidget *button1 = gtk_button_new_with_label("OK");
     GtkWidget *button2 = gtk_button_new_with_label("Password");
+    GtkWidget *button3 = gtk_button_new_with_label("WPS");
     GtkCssProvider *cssProvider = gtk_css_provider_new();
     GtkCssProvider *cssProvider1 = gtk_css_provider_new();
   
@@ -218,23 +228,30 @@ void draw_statement_init()
 
     gtk_widget_set_size_request(button1, 300, 75);
     gtk_widget_set_size_request(button2, 300, 75);
+    gtk_widget_set_size_request(button3, 300, 75);
 
     gtk_widget_set_visible(fixed, TRUE);
     gtk_fixed_put(GTK_FIXED(fixed), label, 850, 295);
+    gtk_fixed_put(GTK_FIXED(fixed), label1, 550, 345);
     gtk_fixed_put(GTK_FIXED(fixed), button1, 645, 385);
     gtk_fixed_put(GTK_FIXED(fixed), button2, 854, 385);
-    gtk_fixed_put(GTK_FIXED(fixed), label1, 550, 345);
+    gtk_fixed_put(GTK_FIXED(fixed), button3, 654, 385);
 
-    gtk_widget_set_name(button1, "button_2");
     gtk_widget_set_name(label, "label");
-    gtk_widget_set_name(button2, "button_3");
     gtk_widget_set_name(label1, "label1");
+    gtk_widget_set_name(button1, "button_1");
+    gtk_widget_set_name(button2, "button_2");
+    gtk_widget_set_name(button3, "button_3");
+
+    gtk_widget_set_visible(draw_state_window, TRUE);
+    gtk_widget_set_visible(label, TRUE);
     
     g_object_set_data(G_OBJECT(draw_state_window), "fixed_data", fixed);
     g_object_set_data(G_OBJECT(draw_state_window), "label_data", label);
     g_object_set_data(G_OBJECT(draw_state_window), "label1_data", label1);
     g_object_set_data(G_OBJECT(draw_state_window), "button1_data", button1);
     g_object_set_data(G_OBJECT(draw_state_window), "button2_data", button2);
+    g_object_set_data(G_OBJECT(draw_state_window), "button3_data", button3);
 
     gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider), "#label {font-size: 40px;}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
@@ -247,8 +264,9 @@ void draw_statement_init()
 
     g_signal_connect(button1, "clicked", G_CALLBACK(button1_clicked), (gpointer)draw_state_window);
     g_signal_connect(button2, "clicked", G_CALLBACK(button2_clicked), (gpointer)draw_state_window);
-    g_signal_connect(button1, "event-after", G_CALLBACK(focus_change_color), NULL);
+    g_signal_connect(button3, "clicked", G_CALLBACK(button3_clicked), (gpointer)draw_state_window);
     g_signal_connect(button2, "event-after", G_CALLBACK(focus_change_color), NULL);
+    g_signal_connect(button3, "event-after", G_CALLBACK(focus_change_color), NULL);
 }
 
 void draw_statement(char statement[40], int wps_dc)
@@ -266,62 +284,46 @@ void draw_statement(char statement[40], int wps_dc)
     GtkWidget *label1 = g_object_get_data(G_OBJECT(draw_state_window), "label1_data");
     GtkWidget *button1 = g_object_get_data(G_OBJECT(draw_state_window), "button1_data");
     GtkWidget *button2 = g_object_get_data(G_OBJECT(draw_state_window), "button2_data");
+    GtkWidget *button3 = g_object_get_data(G_OBJECT(draw_state_window), "button3_data");
     window_if_value = wps_dc;
 
     printf("++ before if 0 %s\n", __func__);
 
     if(wps_dc == 0)
     {
-        printf("++ 1 %s\n", __func__);
         gtk_label_set_markup(GTK_LABEL(label), statement);
-        printf("++ 2 %s\n", __func__);
-        gtk_button_set_label(GTK_BUTTON(button1), "OK");
-        printf("++ 3 %s\n", __func__);
-        gtk_widget_set_visible(label, TRUE);
-        printf("++ 4 %s\n", __func__);
         gtk_widget_set_visible(label1, FALSE);
-        printf("++ 5 %s\n", __func__);
         gtk_widget_set_visible(button1, TRUE);
-        printf("++ 6 %s\n", __func__);
         gtk_widget_set_visible(button2, FALSE);
+        gtk_widget_set_visible(button3, FALSE);
+        gtk_widget_grab_focus(GTK_WIDGET(button1));
     }
 
     if(wps_dc == 1)
     {
+        printf("++ 7 %s\n", __func__);
         gtk_label_set_markup(GTK_LABEL(label), statement);
         gtk_label_set_markup(GTK_LABEL(label1), "Please select connection method");
-        gtk_button_set_label(GTK_BUTTON(button1), "WPS");
-        gtk_widget_set_visible(label, TRUE);
         gtk_widget_set_visible(label1, TRUE);
-        gtk_widget_set_visible(button1, TRUE);
+        gtk_widget_set_visible(button1, FALSE);
         gtk_widget_set_visible(button2, TRUE);
+        gtk_widget_set_visible(button3, TRUE);
+        gtk_widget_grab_focus(GTK_WIDGET(button3));
+        printf("++ 14 %s\n", __func__);
     }
 
     if(wps_dc == 2)
     {
         gtk_label_set_markup(GTK_LABEL(label), "To connect with WiFi press WPS button on your router and press OK");
-        gtk_button_set_label(GTK_BUTTON(button1), "OK");
-        gtk_widget_set_visible(label, TRUE);
         gtk_widget_set_visible(label1, FALSE);
         gtk_widget_set_visible(button1, TRUE);
         gtk_widget_set_visible(button2, FALSE);
+        gtk_widget_set_visible(button3, FALSE);
+        gtk_widget_grab_focus(GTK_WIDGET(button1));
     }
-
-    printf("++ before grab focus %s\n", __func__);
-    gtk_widget_grab_focus(button1);
 
     printf("++ before timeout add %s\n", __func__);
     g_timeout_add(50, allocate_widgets, (gpointer)draw_state_window);
-
-    printf("++ before visible check %s\n", __func__);
-    gtk_widget_queue_draw(draw_state_window);
-    if(gtk_widget_get_visible(draw_state_window) == FALSE)
-        gtk_widget_set_visible(draw_state_window, TRUE); 
-
-
-    printf("++ before show all %s\n", __func__);
-
-    gtk_widget_show(draw_state_window);
 
     printf("++ before main %s\n", __func__);
 
